@@ -1,16 +1,14 @@
 # musicAI
 
-Composing music as **code**. Each piece is a small Python script that writes a
-standard MIDI file; from there you can play it through GarageBand (or any synth),
-stream it live, or engrave it as sheet music. It's a playground for working on
-music *with an LLM in the loop* — the script is the score, so a model (or you)
-can edit individual parts, hear the result, and review changes as diffs.
+Composing music as **code + data**. Musical content lives in YAML; a shared
+library renders it to MIDI, sheet music, or live audio. Designed for working
+with an LLM in the loop — edit the YAML, hear the result, review the diff.
 
-> **For the next assistant:** read this file first, then the per-piece write-ups
-> in [`songs/`](songs/). Favor musically interesting results and clear, readable
-> scripts over abstraction. When asked for a new piece, propose the musical plan
-> (key, mood, tempo, meter, harmony, the "hook") *before* writing code, and lead
-> with concrete music-theory reasoning when asked what would be interesting.
+> **For the next assistant:** read this file first, then open the relevant
+> project folder (`projects/<name>/`) and read its `notes.md`. Favor musically
+> interesting results over abstraction. Propose the musical plan (key, mood,
+> tempo, harmony, the "hook") *before* writing anything, and lead with concrete
+> music-theory reasoning when asked what would be interesting.
 
 ## Layout
 
@@ -18,36 +16,28 @@ can edit individual parts, hear the result, and review changes as diffs.
 musicAI/
 ├── README.md            ← you are here
 ├── requirements.txt
-├── to_sheet.py          # shared tool: engrave note-data (or a .mid) → MusicXML/PDF
-├── play_live.py         # shared tool: stream any .mid live to GarageBand over IAC
+├── render.py            # render any project: render.py <name> [--sheet] [--all]
+├── play_live.py         # stream any .mid live to GarageBand over IAC
+├── to_sheet.py          # engrave note-data (or a .mid) → MusicXML/PDF
 ├── lib/
-│   └── music.py         # shared lib: note parsing, tick math, MIDI event building
-├── data/                # all musical content — edit these to change the music
-│   ├── jazz_progression.yaml  jazz_full.yaml  jazz_with_drums.yaml  jazz_blues.yaml
-│   ├── fur_elise.yaml
-│   ├── jazz_electronic.yaml   # chords, voicings, patterns, drum hits
-│   └── nocturne.yaml          # voicings, per-bar melodies, score sequence
-├── pieces/              # thin scripts: load YAML → call lib → write MIDI
-│   ├── jazz_progression.py   jazz_full.py   jazz_with_drums.py   jazz_blues.py
-│   ├── fur_elise.py
-│   ├── jazz_electronic.py
-│   └── nocturne.py           # add --sheet to also engrave a PDF score
-├── songs/               # human/LLM-readable write-ups, one per notable piece
-│   ├── jazz_electronic.md
-│   └── nocturne.md
+│   └── music.py         # note parsing, tick math, MIDI builders, track types
+├── projects/            # one folder per composition
+│   ├── nocturne/
+│   │   ├── data.yaml    # all musical content (voicings, melodies, score)
+│   │   └── notes.md     # write-up + LLM context for this piece
+│   ├── jazz_electronic/
+│   │   ├── data.yaml
+│   │   ├── notes.md
+│   │   └── custom.py    # algorithmic tracks (polyrhythmic arp, drone logic)
+│   └── jazz_blues/  jazz_full/  jazz_with_drums/  jazz_progression/  fur_elise/
+│       ├── data.yaml
+│       └── notes.md
 └── output/              # everything generated (.mid/.musicxml/.pdf) — git-ignored
 ```
 
-All scripts write their artifacts to `output/`, which is git-ignored — the tracked
-repo stays source-only. Regenerate anything by re-running its script.
-
-**To change the music:** edit the relevant `data/*.yaml` file and re-run.
-No Python knowledge needed for most musical edits (changing a chord, transposing a
-note, adjusting tempo or velocity, tweaking a rhythm pattern).
-
-`jazz_electronic` is the only piece that still needs custom Python — its
-polyrhythmic arp and drone/comp duality are computed, not looked up from a table.
-Everything else is pure YAML → `render.py`.
+**The unit of work is a project folder.** When collaborating with an LLM on a
+piece, point it at `projects/<name>/` — the YAML is the score and `notes.md` is
+the session context.
 
 ## Setup
 
@@ -57,103 +47,106 @@ python3 -m venv .venv
 ```
 
 - **Always run Python as `.venv/bin/python`**, from the **repo root**.
-- macOS only for live play and engraving: live MIDI uses Apple's **IAC Driver**;
-  PDF engraving uses **MuseScore 4** (the app, called headlessly).
+- macOS only: live MIDI uses Apple's **IAC Driver**; PDF engraving uses
+  **MuseScore 4** (called headlessly).
 
 ## The three things you can do
 
 ### 1. Compose → MIDI
 ```bash
-.venv/bin/python render.py nocturne          # writes output/nocturne.mid
-.venv/bin/python render.py --all             # render every piece at once
-.venv/bin/python pieces/jazz_electronic.py   # the one custom piece
+.venv/bin/python render.py nocturne          # one project → output/nocturne.mid
+.venv/bin/python render.py --all             # every project at once
 ```
-Then drag the `.mid` into GarageBand. GarageBand splits the MIDI channels onto
-separate tracks, so each instrument gets its own sound — this is the full-mix path.
+Then drag the `.mid` into GarageBand. GarageBand splits MIDI channels onto
+separate tracks, so each instrument gets its own sound.
 
 ### 2. Play live over IAC (no exporting)
 ```bash
-.venv/bin/python play_live.py nocturne.mid --loop -i 4   # bare names resolve to output/
+.venv/bin/python play_live.py nocturne.mid --loop -i 4
 ```
-Streams all tracks in real time to the IAC bus. Enable it once in **Audio MIDI
-Setup → MIDI Studio → IAC Driver → "Device is online,"** and record-enable /
-monitor the GarageBand track so incoming notes sound.
-**Caveat:** one GarageBand instrument track plays *everything* through a single
-sound. For a true multi-timbral mix, prefer the export path (or make four tracks
-each filtered to one MIDI channel). For a solo-piano piece like the nocturne,
-live play is exactly right.
+Streams all tracks in real time to the IAC bus. Enable the IAC Driver once in
+**Audio MIDI Setup → MIDI Studio → IAC Driver → "Device is online."**
+Bare filenames resolve to `output/` automatically.
 
 ### 3. Engrave → sheet music
 ```bash
-.venv/bin/python render.py --sheet nocturne          # output/nocturne.musicxml + .pdf
-.venv/bin/python to_sheet.py output/jazz_electronic.mid   # rough notation from a .mid
+.venv/bin/python render.py --sheet nocturne      # output/nocturne.pdf + .musicxml
+.venv/bin/python to_sheet.py output/nocturne.mid # rough quantized notation
 ```
-`render.py --sheet` engraves from the **source YAML data** (clean rhythms/accidentals)
-via `to_sheet.build_sheet_from_yaml`. Any piece whose tracks use standard types
-(`scored_melody`, `arpeggio_lh`, `sequential_melody`, etc.) gets a score for free.
-`to_sheet.py` also accepts a raw `.mid` for a quick quantized rendering. See
-[Adding a score](#adding-a-score-to-a-piece) below.
+`--sheet` engraves from the YAML source data (clean rhythms and accidentals).
+Any project whose tracks use standard types gets a score for free — just add
+`key:`, `tempo_marking:`, and `clef:` fields (see nocturne as the reference).
 
-## House conventions (how a piece is built)
+## How pieces are built
 
-- `TICKS_PER_BEAT` (often `TPB`) = **480**. Express durations in ticks; derive
-  sixteenth/eighth/etc. as named constants.
-- Build each instrument as its own `MidiTrack`: collect absolute-time note events,
-  sort them, then convert to delta times when writing. (See `build_track` in
-  `lib/music.py` and `pieces/jazz_electronic.py`.)
-- **One channel per instrument. Drums always on channel 9** (GM channel 10),
-  using the General MIDI percussion map (kick 36, snare 38, clap 39, closed hat
-  42, open hat 46, shaker 70, …).
-- `program_change` is a hint for GM synths; GarageBand ignores it and uses the
-  track's assigned instrument. Sustain pedal = CC 64.
-- Comment the **musical intent** (voicing degrees, why a chord is there), not the
-  mechanics of mido.
-
-## Adding a score to a piece
-
-If the piece uses standard track types, sheet music is free — just add three
-fields to its YAML and run `render.py --sheet <name>`:
+### Standard pieces (YAML only)
+All musical content in `data.yaml`, rendered entirely by `render.py`:
 
 ```yaml
-key: e                          # key signature (e, C, Bb, F#, etc.)
-tempo_marking: "Andante"        # optional text above the tempo mark
+title: My Piece
+tempo: 120
+key: e
 tracks:
-  - name: Right Hand
-    type: scored_melody          # or sequential_melody, block_chords, etc.
-    clef: treble                 # treble or bass
-    ...
-  - name: Left Hand
-    type: arpeggio_lh
+  - name: Melody
+    type: sequential_melody   # ordered note/rest sequence
+    clef: treble
+    notes: [[E5, 0.5], [D#5, 0.25], ...]
+
+  - name: Bass
+    type: sustained_notes     # held notes
     clef: bass
-    ...
+    notes: [[A2, 1.5], ...]
 ```
 
-`to_sheet.build_sheet_from_yaml` dispatches by `type:` — the same mapping that
-renders MIDI also renders notation. `drum_grid` tracks are silently skipped.
+**Available track types:**
 
-For a custom piece (like `jazz_electronic`), use the low-level `Sheet` API directly:
-```
-A piece in `pieces/` reaches the root tool with a one-line `sys.path` insert at
-the top (see `nocturne.py`). MuseScore is flaky headless, so `to_sheet` retries a
-few times and always writes the MusicXML even if PDF rendering fails.
+| `type` | What it does |
+|---|---|
+| `block_chords` | All chord notes together for N beats; loops the progression |
+| `walking_bass` | One note per beat with articulation gap; loops |
+| `drum_grid` | Step-grid pattern (0-based 16th indices); `hits:` list |
+| `sequential_melody` | Ordered `[note_or_null, quarter_length]` entries |
+| `sustained_notes` | Each entry held for its full duration |
+| `scored_melody` | Melody from a `{bar_ref: notes}` dict, arranged by a `score:` list |
+| `arpeggio_lh` | Chord voicings expanded via an index `pattern:`, with optional sustain pedal |
 
-## Pieces
+`drum_grid` is skipped by the sheet engraver. All other types produce notation.
 
-| Piece | What it is | Write-up |
-|---|---|---|
-| `jazz_progression` → `jazz_full` → `jazz_with_drums` → `jazz_blues` | progressive jazz sketches (chords → arrangement → drums → 12-bar blues) | — |
-| `fur_elise` | classical melody + sustained-bass study | — |
-| `jazz_electronic` | 16-bar A/B jazz-electronic; 3-against-4 polyrhythmic arp; B-section planes maj7♯11 over an A drone | [songs/jazz_electronic.md](songs/jazz_electronic.md) |
-| `nocturne` | original solo-piano Nocturne in E minor ("Lamplight"), ternary form, engraved score | [songs/nocturne.md](songs/nocturne.md) |
+### Custom pieces (YAML + custom.py)
+If a project has `custom.py`, `render.py` calls its `render(d) → [MidiTrack, …]`
+function instead of the generic dispatcher. Use this only when tracks are
+*computed* rather than looked up — `jazz_electronic` is the current example
+(polyrhythmic arp, per-chord drone/comp switching).
 
-## Generated files
+## Adding a new project
 
-Everything the scripts produce (`.mid`, `.musicxml`, `.pdf`) goes into `output/`,
-which is git-ignored — so the tracked repo is source-only and the working tree
-stays clean. Regenerate any artifact by re-running its script (or `--sheet`).
-`play_live.py` and `to_sheet.py` accept bare names and look in `output/`.
+**Standard piece (YAML only):**
+1. Create `projects/my_piece/data.yaml` with `title`, `tempo`, `tracks:`.
+2. Run `render.py my_piece`.
+3. Add `projects/my_piece/notes.md` with context for future sessions.
+4. Add `key:` and `clef:` fields to enable `--sheet`.
+
+**Custom piece:**
+Same as above, plus `projects/my_piece/custom.py` exposing `render(d)`.
+
+## Note format
+
+Notes use scientific pitch: `C4` = middle C = MIDI 60. Sharps: `C#4`, `D#5`.
+Flats: `Bb3`, `Eb4`. Rests: `null`. Durations are **quarter-lengths**:
+`0.25` = 16th, `0.5` = eighth, `1.0` = quarter, `1.5` = dotted quarter.
+
+## Projects
+
+| Project | Style | Tracks | Notes |
+|---|---|---|---|
+| `jazz_progression` | ii–V–I sketch | chords | — |
+| `jazz_with_drums` | ii–V–I + swing kit | chords, drums | — |
+| `jazz_full` | ii–V–I full band | chords, walking bass, drums | — |
+| `jazz_blues` | 12-bar F blues | chords, walking bass, drums | — |
+| `fur_elise` | Classical melody study | melody, bass | A section only |
+| `jazz_electronic` | 16-bar A/B jazz-electronic | Rhodes, synth bass, poly arp, drums | custom.py |
+| `nocturne` | Original piano nocturne | Piano RH, Piano LH | score available |
 
 ## Dependencies
 
-`mido` (MIDI I/O) · `python-rtmidi` (live ports) · `music21` (notation) ·
-**MuseScore 4** for PDF · macOS **IAC Driver** for live play.
+`mido` · `python-rtmidi` · `music21` · `pyyaml` · **MuseScore 4** (PDF) · macOS **IAC Driver** (live)

@@ -28,7 +28,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib.music import note_to_midi, notes_to_midi
+from lib.music import note_to_midi, notes_to_midi, PROJ_DIR
 
 from music21 import (stream, note, chord, meter, key, tempo, clef, layout,
                      metadata, dynamics, expressions, converter)

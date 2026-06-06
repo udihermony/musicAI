@@ -17,8 +17,8 @@ import re
 import yaml
 from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(ROOT, "data")
+ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJ_DIR  = os.path.join(ROOT, "projects")
 OUTPUT_DIR = os.path.join(ROOT, "output")
 TPB = 480  # ticks per quarter note — project-wide standard
 
@@ -63,10 +63,9 @@ def ql(quarters, tpb=TPB):
 # ---------------------------------------------------------------------------
 
 def load(name):
-    """Load a YAML data file from data/. Pass 'piece' or 'piece.yaml'."""
-    if not name.endswith(".yaml"):
-        name += ".yaml"
-    with open(os.path.join(DATA_DIR, name)) as f:
+    """Load data.yaml from projects/<name>/data.yaml."""
+    path = os.path.join(PROJ_DIR, name, "data.yaml")
+    with open(path) as f:
         return yaml.safe_load(f)
 
 

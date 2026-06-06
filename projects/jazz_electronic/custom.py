@@ -1,10 +1,25 @@
-"""Jazz-electronic piece. All musical content lives in data/jazz_electronic.yaml."""
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from lib.music import (load, note_to_midi, notes_to_midi, ql, note_on,
-                       build_track, write_midi, out_path, expand_drum_pattern)
+"""Custom track builders for jazz_electronic.
+
+Called by render.py when it finds this file. Must expose:
+    render(d) -> list[MidiTrack]
+
+The three tracks here are algorithmic — they can't be expressed as a lookup
+table in data.yaml:
+  keys_events  — Rhodes comp switches between syncopated hits (figure bars)
+                 and a sustained pad (drone bars) based on chord["style"].
+  bass_events  — synth bass either holds a pedal (drone) or runs a syncopated
+                 figure with octave jumps (figure).
+  arp_events   — 3-against-4 polyrhythm: one note every dotted-eighth, cycling
+                 chord-tone pools that shift each bar. The phase drift is the
+                 whole hook and can't be pre-computed from static step positions.
+"""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from lib.music import (note_to_midi, notes_to_midi, ql, note_on,
+                       build_track, expand_drum_pattern)
 
 S = 480 // 4   # one sixteenth in ticks
+
 
 def keys_events(d):
     bar  = ql(4)
@@ -24,6 +39,7 @@ def keys_events(d):
                     note_on(ev, base + start, m, dur, vel, ch=ch)
     return ev
 
+
 def bass_events(d):
     bar = ql(4)
     fig = d["patterns"]["bass_figure"]
@@ -40,6 +56,7 @@ def bass_events(d):
                 note_on(ev, base + pos * S, root + octv, length * S, vel, ch=ch)
     return ev
 
+
 def arp_events(d):
     bar   = ql(4)
     step  = d["patterns"]["arp_step_ticks"]
@@ -49,7 +66,7 @@ def arp_events(d):
     ev    = []
     t = idx = 0
     while t < total:
-        i = min(t // bar, len(d["chords"]) - 1)
+        i       = min(t // bar, len(d["chords"]) - 1)
         voicing = notes_to_midi(d["chords"][i]["voicing"])
         pool    = voicing + [voicing[0] + 12, voicing[1] + 12]
         vel     = 90 if t % bar == 0 else 74
@@ -58,26 +75,20 @@ def arp_events(d):
         t   += step
     return ev
 
-if __name__ == "__main__":
-    d     = load("jazz_electronic")
-    n     = len(d["chords"])
-    ch    = d["channels"]
-    pr    = d["programs"]
-    fill  = d["drums"].get("fill", {})
+
+def render(d):
+    ch   = d["channels"]
+    pr   = d["programs"]
+    fill = d["drums"].get("fill", {})
     drums = expand_drum_pattern(
-        d["drums"], n, ql(4),
+        d["drums"], len(d["chords"]), ql(4),
         swing_ticks=d["drums"]["swing_ticks"],
         fill_every=fill.get("every_n_bars"),
         fill_notes=fill or None,
     )
-    tracks = [
+    return [
         build_track(keys_events(d), "Rhodes",     pr["keys"], ch["keys"], tempo_bpm=d["tempo"]),
         build_track(bass_events(d), "Synth Bass", pr["bass"], ch["bass"]),
         build_track(arp_events(d),  "Poly Arp",   pr["arp"],  ch["arp"]),
         build_track(drums,          "Drums",       channel=ch["drums"]),
     ]
-    write_midi(out_path("jazz_electronic.mid"), tracks)
-    print(f"wrote jazz_electronic.mid — {n} bars of 4/4 at {d['tempo']} BPM (A/B form)")
-    print(f"  A: {' '.join(c['name'] for c in d['chords'][:8])}")
-    print(f"  B: {' '.join(c['name'] for c in d['chords'][8:])}")
-    print("tracks: 1) Rhodes  2) Synth Bass  3) Poly Arp  4) Drums")
