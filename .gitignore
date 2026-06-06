@@ -1,0 +1,18 @@
+# Environment
+.venv/
+__pycache__/
+*.pyc
+
+# Heavy / throwaway render artifacts (regenerate from source)
+*.png
+*.wav
+*.aif
+*.aiff
+
+# Scratch
+_*.musicxml
+_*.pdf
+.DS_Store
+
+# Local agent/editor settings
+.claude/settings.local.json
