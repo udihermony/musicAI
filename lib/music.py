@@ -187,3 +187,117 @@ def expand_drum_pattern(pattern_data, n_bars, bar_ticks, swing_ticks=0,
                 note_on(events, t, fill_midi, step_ticks - 1, vel, ch=9)
 
     return events
+
+
+# ---------------------------------------------------------------------------
+# Generic track builders — keyed by YAML `type:` field.
+# Each takes: td (track dict), d (global piece dict), plus keyword args.
+# `first=True` embeds tempo + time_signature metadata in that track.
+# ---------------------------------------------------------------------------
+
+def _meta(td, d, first):
+    """Return kwargs for build_track that carry metadata only on the first track."""
+    if not first:
+        return {}
+    out = {"tempo_bpm": d["tempo"]}
+    ts = d.get("time_signature")
+    if ts:
+        out["time_sig"] = ts
+    return out
+
+
+def build_block_chords(td, d, loops=1, first=False):
+    """Play all chord notes simultaneously for their duration. Loops the progression."""
+    ch  = td.get("channel", 0)
+    vel = td.get("velocity", d.get("velocity", 80))
+    default_beats = td.get("beats_per_chord", d.get("beats_per_chord", 4))
+    prog = td.get("progression", d.get("progression", []))
+    ev = []
+    t = 0
+    for _ in range(loops):
+        for chord in prog:
+            dur = ql(chord.get("beats", default_beats))
+            for m in notes_to_midi(chord["notes"]):
+                note_on(ev, t, m, dur, vel, ch=ch)
+            t += dur
+    return build_track(ev, td.get("name", "Chords"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
+def build_walking_bass(td, d, loops=1, first=False):
+    """One note per beat with a short articulation gap. Loops the bar list."""
+    ch      = td.get("channel", 1)
+    vel     = td.get("velocity", d.get("velocity", 85))
+    gap     = td.get("note_gap", 20)
+    bars    = td.get("bars", [])
+    beat    = ql(1.0)
+    dur     = beat - gap
+    ev = []
+    t = gap
+    for _ in range(loops):
+        for bar in bars:
+            for pitch in bar:
+                note_on(ev, t, note_to_midi(pitch), dur, vel, ch=ch)
+                t += beat
+    return build_track(ev, td.get("name", "Walking Bass"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
+def build_drum_grid(td, d, n_bars=1, first=False):
+    """Step-grid drum pattern. n_bars is the total bar count (loops already applied)."""
+    bar_ticks = ql(4)   # assumes 4/4; override via td["bar_beats"] if needed
+    if "bar_beats" in td:
+        bar_ticks = ql(td["bar_beats"])
+    fill = td.get("fill")
+    ev = expand_drum_pattern(
+        td, n_bars, bar_ticks,
+        swing_ticks=td.get("swing_ticks", 0),
+        fill_every=fill.get("every_n_bars") if fill else None,
+        fill_notes=fill if fill else None,
+    )
+    return build_track(ev, td.get("name", "Drums"),
+                       channel=td.get("channel", 9), **_meta(td, d, first))
+
+
+def build_sequential_melody(td, d, loops=1, first=False):
+    """Ordered list of [note_or_null, quarter_length] entries. Rests on null."""
+    ch  = td.get("channel", 0)
+    vel = td.get("velocity", d.get("melody_velocity", 80))
+    ev = []
+    t = 0
+    for _ in range(loops):
+        for entry in td.get("notes", []):
+            pitch, dur_ql = entry
+            dur = ql(dur_ql)
+            m = note_to_midi(pitch)
+            if m is not None:
+                note_on(ev, t, m, dur, vel, ch=ch)
+            t += dur
+    return build_track(ev, td.get("name", "Melody"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
+def build_sustained_notes(td, d, loops=1, first=False):
+    """Each entry is [note, quarter_length] — held for its full duration."""
+    ch  = td.get("channel", 1)
+    vel = td.get("velocity", d.get("bass_velocity", 70))
+    ev = []
+    t = 0
+    for _ in range(loops):
+        for entry in td.get("notes", []):
+            pitch, dur_ql = entry
+            dur = ql(dur_ql)
+            note_on(ev, t, note_to_midi(pitch), dur, vel, ch=ch)
+            t += dur
+    return build_track(ev, td.get("name", "Bass"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
+# Map type strings to builder functions (used by render.py)
+TRACK_BUILDERS = {
+    "block_chords":      build_block_chords,
+    "walking_bass":      build_walking_bass,
+    "drum_grid":         build_drum_grid,
+    "sequential_melody": build_sequential_melody,
+    "sustained_notes":   build_sustained_notes,
+}

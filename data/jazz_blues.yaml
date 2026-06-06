@@ -1,84 +1,57 @@
 title: Jazz Blues
 description: F jazz blues — 12-bar form with walking bass and swing drums. 4 loops.
-
 tempo: 120
-velocity: 80
 loops: 4
 
-# 12-bar blues in F. beats = quarter notes this chord lasts.
-progression:
-  - name: F7
-    notes: [F4, A4, C5, Eb5]
-    beats: 4                    # I7
-  - name: Bb7
-    notes: [Bb3, D4, F4, Ab4]
-    beats: 4                    # IV7
-  - name: F7
-    notes: [F4, A4, C5, Eb5]
-    beats: 4                    # I7
-  - name: Cm7
-    notes: [C4, Eb4, G4, Bb4]
-    beats: 2                    # ii of IV
-  - name: F7
-    notes: [F4, A4, C5, Eb5]
-    beats: 2                    # V7 of IV
-  - name: Bb7
-    notes: [Bb3, D4, F4, Ab4]
-    beats: 4                    # IV7
-  - name: Bdim7
-    notes: [B3, D4, F4, Ab4]
-    beats: 4                    # #IV diminished passing chord
-  - name: F7
-    notes: [F4, A4, C5, Eb5]
-    beats: 4                    # I7
-  - name: D7
-    notes: [D4, F#4, A4, C5]
-    beats: 4                    # V of ii (secondary dominant)
-  - name: Gm7
-    notes: [G3, Bb3, D4, F4]
-    beats: 4                    # ii
-  - name: C7
-    notes: [C4, E4, G4, Bb4]
-    beats: 4                    # V7
-  - name: F7
-    notes: [F4, A4, C5, Eb5]
-    beats: 4                    # I7
-  - name: Gm7
-    notes: [G3, Bb3, D4, F4]
-    beats: 2                    # turnaround ii
-  - name: C7
-    notes: [C4, E4, G4, Bb4]
-    beats: 2                    # turnaround V
+tracks:
+  - name: Blues Chords
+    type: block_chords
+    channel: 0
+    velocity: 80
+    # beats = quarter notes this chord lasts (variable per chord)
+    progression:
+      - {name: F7,    notes: [F4, A4, C5, Eb5],  beats: 4}  # I7
+      - {name: Bb7,   notes: [Bb3, D4, F4, Ab4], beats: 4}  # IV7
+      - {name: F7,    notes: [F4, A4, C5, Eb5],  beats: 4}  # I7
+      - {name: Cm7,   notes: [C4, Eb4, G4, Bb4], beats: 2}  # ii of IV
+      - {name: F7,    notes: [F4, A4, C5, Eb5],  beats: 2}  # V7 of IV
+      - {name: Bb7,   notes: [Bb3, D4, F4, Ab4], beats: 4}  # IV7
+      - {name: Bdim7, notes: [B3, D4, F4, Ab4],  beats: 4}  # #IV diminished passing
+      - {name: F7,    notes: [F4, A4, C5, Eb5],  beats: 4}  # I7
+      - {name: D7,    notes: [D4, F#4, A4, C5],  beats: 4}  # V of ii
+      - {name: Gm7,   notes: [G3, Bb3, D4, F4],  beats: 4}  # ii
+      - {name: C7,    notes: [C4, E4, G4, Bb4],  beats: 4}  # V7
+      - {name: F7,    notes: [F4, A4, C5, Eb5],  beats: 4}  # I7
+      - {name: Gm7,   notes: [G3, Bb3, D4, F4],  beats: 2}  # turnaround ii
+      - {name: C7,    notes: [C4, E4, G4, Bb4],  beats: 2}  # turnaround V
 
-# Walking bass — 12 bars × 4 beats. Last beat approaches the next root chromatically.
-walking_bass:
-  note_gap: 20
-  velocity: 85
-  bars:
-    - [F2,  A2,  C3,  B2]   # F7     (→ Bb)
-    - [Bb2, D3,  F3,  E3]   # Bb7    (→ F)
-    - [F2,  A2,  C3,  B2]   # F7     (→ C)
-    - [C3,  Eb3, F2,  B2]   # Cm7|F7 (→ Bb)
-    - [Bb2, D3,  F3,  C3]   # Bb7    (→ B)
-    - [B2,  D3,  F3,  Ab3]  # Bdim7  (→ F)
-    - [F2,  A2,  C3,  C#3]  # F7     (→ D)
-    - [D3,  F#3, A3,  Ab3]  # D7     (→ G)
-    - [G2,  Bb2, D3,  C#3]  # Gm7    (→ C)
-    - [C3,  E3,  G3,  F#3]  # C7     (→ F)
-    - [F2,  A2,  C3,  Ab2]  # F7     (→ G)
-    - [G2,  Bb2, C3,  E2]   # Gm7|C7 (→ F loop)
+  - name: Walking Bass
+    type: walking_bass
+    channel: 1
+    velocity: 85
+    note_gap: 20
+    # 12 bars × 4 beats. Last beat of each bar approaches the next root chromatically.
+    bars:
+      - [F2,  A2,  C3,  B2]   # F7     (-> Bb)
+      - [Bb2, D3,  F3,  E3]   # Bb7    (-> F)
+      - [F2,  A2,  C3,  B2]   # F7     (-> C)
+      - [C3,  Eb3, F2,  B2]   # Cm7|F7 (-> Bb)
+      - [Bb2, D3,  F3,  C3]   # Bb7    (-> B)
+      - [B2,  D3,  F3,  Ab3]  # Bdim7  (-> F)
+      - [F2,  A2,  C3,  C#3]  # F7     (-> D)
+      - [D3,  F#3, A3,  Ab3]  # D7     (-> G)
+      - [G2,  Bb2, D3,  C#3]  # Gm7    (-> C)
+      - [C3,  E3,  G3,  F#3]  # C7     (-> F)
+      - [F2,  A2,  C3,  Ab2]  # F7     (-> G)
+      - [G2,  Bb2, C3,  E2]   # Gm7|C7 (-> F loop)
 
-drums:
-  steps_per_bar: 8
-  hits:
-    - note: ride
-      steps: [0, 2, 4, 6]
-      velocity: 65
-    - note: ride
-      steps: [3, 7]
-      velocity: 65
-    - note: pedal_hat
-      steps: [2, 6]
-      velocity: 55
-  swing_steps: [3, 7]
-  swing_ticks: 80
+  - name: Jazz Drums
+    type: drum_grid
+    channel: 9
+    steps_per_bar: 8
+    swing_ticks: 80
+    swing_steps: [3, 7]
+    hits:
+      - {note: ride,      steps: [0, 2, 4, 6], velocity: 65}
+      - {note: ride,      steps: [3, 7],        velocity: 65}
+      - {note: pedal_hat, steps: [2, 6],        velocity: 55}
