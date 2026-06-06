@@ -84,7 +84,9 @@ def render(name):
             if kind == "drum_grid":
                 kwargs["n_bars"] = n_bars
             else:
-                kwargs["loops"] = loops
+                # Track-level loops overrides global — lets a short pattern
+                # repeat independently of other tracks.
+                kwargs["loops"] = td.get("loops", loops)
             midi_tracks.append(builder(td, d, **kwargs))
 
     path = out_path(f"{name}.mid")

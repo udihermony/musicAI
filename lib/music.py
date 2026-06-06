@@ -260,19 +260,25 @@ def build_drum_grid(td, d, n_bars=1, first=False):
 
 
 def build_sequential_melody(td, d, loops=1, first=False):
-    """Ordered list of [note_or_null, quarter_length] entries. Rests on null."""
-    ch  = td.get("channel", 0)
-    vel = td.get("velocity", d.get("melody_velocity", 80))
+    """Ordered list of [note_or_null, quarter_length] entries. Rests on null.
+
+    articulation (0.0-1.0): fraction of the slot the note sounds — 1.0 is
+    fully legato, 0.75 is punchy (good for funk bass), 0.5 is staccato.
+    """
+    ch          = td.get("channel", 0)
+    vel         = td.get("velocity", d.get("melody_velocity", 80))
+    articulation = td.get("articulation", 1.0)
     ev = []
     t = 0
     for _ in range(loops):
         for entry in td.get("notes", []):
             pitch, dur_ql = entry
-            dur = ql(dur_ql)
-            m = note_to_midi(pitch)
+            slot = ql(dur_ql)
+            m    = note_to_midi(pitch)
             if m is not None:
-                note_on(ev, t, m, dur, vel, ch=ch)
-            t += dur
+                sounding = max(1, int(slot * articulation))
+                note_on(ev, t, m, sounding, vel, ch=ch)
+            t += slot
     return build_track(ev, td.get("name", "Melody"),
                        program=td.get("program"), channel=ch, **_meta(td, d, first))
 

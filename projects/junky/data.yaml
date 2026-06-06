@@ -62,3 +62,56 @@ tracks:
       velocity_start: 50
       velocity_ramp: 12
       every_n_bars: 4
+
+  # ---------------------------------------------------------------------------
+  # Bass — D minor / D Dorian. Syncopated 2-bar pattern × 4 loops = 8 bars.
+  # Durations are quarter-lengths: 0.25=16th, 0.5=8th, 0.75=dotted-8th.
+  # articulation 0.75 = punchy staccato (funky bass never sustains fully).
+  # ---------------------------------------------------------------------------
+  - name: Bass
+    type: sequential_melody
+    channel: 1
+    velocity: 95
+    articulation: 0.75
+    loops: 4            # 2-bar pattern × 4 = 8 bars
+
+    notes:
+      # --- Bar A (question) — locks with kick on all 5 kick positions ---
+      # Step 0:  D2 8th     beat 1, kick anchor
+      - [D2,   0.5]
+      # Step 2:  rest       space before the push
+      - [null, 0.25]
+      # Step 3:  D2 16th    a-of-1 — the key lock with syncopated kick
+      - [D2,   0.25]
+      # Step 4:  F2 8th     beat 2, lands under snare
+      - [F2,   0.5]
+      # Step 6:  G2 8th     and-of-2, keeps moving
+      - [G2,   0.5]
+      # Step 8:  D2 8th     beat 3, kick anchor
+      - [D2,   0.5]
+      # Step 10: A2 8th     and-of-3, locks with kick
+      - [A2,   0.5]
+      # Step 12: D3 8th     beat 4 — octave jump, the funk hook
+      - [D3,   0.5]
+      # Step 14: C3 8th     and-of-4 — leads back toward D (lock with kick + open hat)
+      - [C3,   0.5]
+
+      # --- Bar B (answer) — more space; rests where Bar A hit ---
+      # Step 0:  D2 dotted-8th  beat 1, sits longer
+      - [D2,   0.75]
+      # Step 3:  A2 16th        a-of-1 — the 5th instead of root, unexpected
+      - [A2,   0.25]
+      # Step 4:  F2 8th         beat 2, snare
+      - [F2,   0.5]
+      # Steps 6-7: rest         big space — the groove breathes
+      - [null, 0.5]
+      # Step 8:  D2 8th         beat 3, kick anchor
+      - [D2,   0.5]
+      # Step 10: rest           kick hits but bass rests — contrast with Bar A
+      - [null, 0.25]
+      # Step 11: G2 16th        a-of-3, small fill
+      - [G2,   0.25]
+      # Step 12: C3 8th         beat 4 — tritone tension against D root
+      - [C3,   0.5]
+      # Step 14: A2 8th         and-of-4 — dominant, pulls back to D (lock with kick)
+      - [A2,   0.5]
