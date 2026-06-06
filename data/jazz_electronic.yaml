@@ -1,0 +1,141 @@
+title: Jazz Electronic
+description: >
+  16-bar A/B form, 4/4 at 84 BPM. Dark A-minor modal loop with a polyrhythmic
+  arp. A section: i-iv-bII-bVI-V7b9. B section: maj7#11 shapes planed over an
+  A-pedal drone, resolved by a Cm9-Bb13 tritone-sub turnaround.
+
+tempo: 84
+time_signature: [4, 4]
+
+channels:
+  keys: 0
+  bass: 1
+  arp: 2
+  drums: 9
+
+programs:
+  keys: 4     # Electric Piano 1
+  bass: 38    # Synth Bass 1
+  arp: 81     # Sawtooth Lead
+
+# Rootless/extended mid-register voicings. bass is the sub-bass root.
+# style: "figure" = syncopated comp + active bass
+#        "drone"  = sustained pad + held A pedal
+chords:
+  # A section (bars 1-8): dark A-aeolian
+  - name: Am9
+    voicing: [C4, E4, G4, B4]
+    bass: A1
+    style: figure
+  - name: Am9
+    voicing: [C4, E4, G4, B4]
+    bass: A1
+    style: figure
+  - name: Dm9
+    voicing: [F4, A4, C5, E5]
+    bass: D2
+    style: figure
+  - name: Dm9
+    voicing: [F4, A4, C5, E5]
+    bass: D2
+    style: figure
+  - name: Bbmaj7#11
+    voicing: [D4, F4, A4, E5]
+    bass: Bb1
+    style: figure
+  - name: Fmaj9
+    voicing: [A3, C4, E4, G4]
+    bass: F1
+    style: figure
+  - name: E7b9
+    voicing: [G#4, B4, D5, F5]
+    bass: E1
+    style: figure
+  - name: E7b9
+    voicing: [G#4, B4, D5, F5]
+    bass: E1
+    style: figure
+  # B section (bars 9-16): maj7#11 planed over an A drone -> tritone-sub turnaround
+  - name: Bbmaj7#11/A
+    voicing: [D4, F4, A4, E5]
+    bass: A1
+    style: drone
+  - name: Cmaj7#11/A
+    voicing: [E4, G4, B4, F#5]
+    bass: A1
+    style: drone
+  - name: Dbmaj7#11/A
+    voicing: [F4, Ab4, C5, G5]
+    bass: A1
+    style: drone
+  - name: Cmaj7#11/A
+    voicing: [E4, G4, B4, F#5]
+    bass: A1
+    style: drone
+  - name: Bbmaj7#11/A
+    voicing: [D4, F4, A4, E5]
+    bass: A1
+    style: drone
+  - name: Abmaj7#11/A
+    voicing: [C4, Eb4, G4, D5]
+    bass: A1
+    style: drone
+  - name: Cm9
+    voicing: [Eb4, G4, Bb4, D5]
+    bass: C2
+    style: figure   # off the pedal
+  - name: Bb13
+    voicing: [D4, Ab4, C5, G5]
+    bass: Bb1
+    style: figure   # tritone sub -> A
+
+patterns:
+  # Syncopated two-hit Rhodes comp: [start_ticks_in_bar, duration_ticks]
+  keys_comp:
+    - [0,    1200]
+    - [1200, 720]
+
+  # Synth-bass figure: [start_16th, length_16ths, octave_offset_semitones]
+  bass_figure:
+    - [0,  3, 0]
+    - [3,  1, 0]
+    - [6,  2, 12]
+    - [10, 2, 0]
+    - [12, 3, 12]
+
+  # Arp: one note every dotted-eighth (3 sixteenths = 360 ticks) — the 3-against-4 hook.
+  arp_step_ticks: 360
+  arp_note_dur_ticks: 220   # plucky, leaves an electronic gap
+
+drums:
+  steps_per_bar: 16
+  swing_ticks: 50           # offbeat hat push
+  swing_steps: [1, 3, 5, 7, 9, 11, 13, 15]   # all off-8th steps
+  hits:
+    - note: kick
+      steps: [0, 6, 10]
+      velocity: 110
+    - note: snare
+      steps: [4, 12]
+      velocity: 104
+    - note: clap
+      steps: [4, 12]
+      velocity: 82
+    - note: snare         # ghost
+      steps: [7]
+      velocity: 44
+    - note: closed_hat
+      steps: [0, 2, 4, 6, 8, 10, 12]   # 8ths (on-beats only; swung off-beats handled in open_hat)
+      velocity: 82
+    - note: open_hat
+      steps: [14]         # push into next bar
+      velocity: 86
+    - note: shaker
+      steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      velocity: 34        # even steps; odd steps handled via ramp below
+  fill:
+    note: snare
+    steps: [10, 11, 12, 13, 14, 15]
+    velocity_start: 60
+    velocity_ramp: 9
+    every_n_bars: 8       # fill on bar 8 and bar 16

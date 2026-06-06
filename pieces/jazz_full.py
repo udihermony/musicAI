@@ -1,72 +1,45 @@
-from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from lib.music import (load, note_to_midi, notes_to_midi, ql, note_on,
+                       build_track, write_midi, out_path, expand_drum_pattern)
 
-from jazz_progression import (
-    PROGRESSION,
-    TEMPO_BPM,
-    VELOCITY,
-    BEATS_PER_CHORD,
-    TICKS_PER_BEAT,
-)
-from jazz_with_drums import build_drum_track
-
-LOOPS = 4
-BASS_CHANNEL = 1
-BASS_VELOCITY = 85
-NOTE_GAP = 20  # ticks of silence between bass notes for articulation
-
-# Walking bass — one note per beat, last beat is a chromatic approach to the next root.
-# Dm7 → G7 (approach via Ab2), G7 → Cmaj7 (approach via Db3), Cmaj7 → Dm7 loop (approach via Eb2).
-WALKING_BASS = [
-    [38, 41, 45, 44],  # Dm7:   D2  F2  A2  Ab2
-    [43, 47, 50, 49],  # G7:    G2  B2  D3  Db3
-    [48, 43, 40, 39],  # Cmaj7: C3  G2  E2  Eb2
-]
-
-
-def build_chord_track_looped(progression, beats_per_chord: int, loops: int) -> MidiTrack:
-    track = MidiTrack()
-    track.append(MetaMessage("set_tempo", tempo=bpm2tempo(TEMPO_BPM)))
-    track.append(MetaMessage("track_name", name="Jazz Chords"))
-    duration = TICKS_PER_BEAT * beats_per_chord
+def chord_track(d, loops):
+    bar = ql(d["beats_per_chord"])
+    ev = []
+    t = 0
     for _ in range(loops):
-        for _, chord in progression:
-            for note in chord:
-                track.append(Message("note_on", note=note, velocity=VELOCITY, time=0, channel=0))
-            for i, note in enumerate(chord):
-                track.append(Message("note_off", note=note, velocity=0, time=duration if i == 0 else 0, channel=0))
-    return track
+        for chord in d["progression"]:
+            for m in notes_to_midi(chord["notes"]):
+                note_on(ev, t, m, bar, d["velocity"])
+            t += bar
+    return build_track(ev, "Jazz Chords", tempo_bpm=d["tempo"])
 
-
-def build_bass_track_looped(walking_bass, loops: int) -> MidiTrack:
-    track = MidiTrack()
-    track.append(MetaMessage("track_name", name="Walking Bass"))
-    note_dur = TICKS_PER_BEAT - NOTE_GAP
-    first = True
+def bass_track(d, loops):
+    wb = d["walking_bass"]
+    gap = wb["note_gap"]
+    vel = wb["velocity"]
+    beat = ql(1.0)
+    note_dur = beat - gap
+    ev = []
+    t = gap
     for _ in range(loops):
-        for bar in walking_bass:
-            for note in bar:
-                on_time = 0 if first else NOTE_GAP
-                track.append(Message("note_on", note=note, velocity=BASS_VELOCITY, time=on_time, channel=BASS_CHANNEL))
-                track.append(Message("note_off", note=note, velocity=0, time=note_dur, channel=BASS_CHANNEL))
-                first = False
-    return track
+        for bar in wb["bars"]:
+            for pitch in bar:
+                m = note_to_midi(pitch)
+                note_on(ev, t, m, note_dur, vel, ch=1)
+                t += beat
+    return build_track(ev, "Walking Bass")
 
-
-def write_full(path: str, loops: int = LOOPS) -> None:
-    mid = MidiFile(ticks_per_beat=TICKS_PER_BEAT)
-    mid.tracks.append(build_chord_track_looped(PROGRESSION, BEATS_PER_CHORD, loops))
-    mid.tracks.append(build_bass_track_looped(WALKING_BASS, loops))
-    mid.tracks.append(build_drum_track(num_bars=loops * len(PROGRESSION)))
-    mid.save(path)
-
+def drum_track(d, n_bars):
+    dd = d["drums"]
+    ev = expand_drum_pattern(dd, n_bars, ql(4), swing_ticks=dd.get("swing_ticks", 0))
+    return build_track(ev, "Jazz Drums")
 
 if __name__ == "__main__":
-    import os
-    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
-    os.makedirs(OUT, exist_ok=True)
-    out = os.path.join(OUT, "jazz_full.mid")
-    write_full(out, loops=LOOPS)
-    total_bars = LOOPS * len(PROGRESSION)
-    print(f"wrote {out} — {LOOPS} loops × {len(PROGRESSION)} bars = {total_bars} bars")
+    d = load("jazz_full")
+    loops = d["loops"]
+    n_bars = loops * len(d["progression"])
+    tracks = [chord_track(d, loops), bass_track(d, loops), drum_track(d, n_bars)]
+    write_midi(out_path("jazz_full.mid"), tracks)
+    print(f"wrote jazz_full.mid — {loops} loops × {len(d['progression'])} bars = {n_bars} bars")
     print("tracks: 1) Jazz Chords  2) Walking Bass  3) Jazz Drums")
-    print("drag into GarageBand — assign piano / upright bass / drum kit.")

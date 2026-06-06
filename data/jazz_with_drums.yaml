@@ -1,0 +1,29 @@
+title: Jazz With Drums
+description: ii-V-I in C major with a swing ride-cymbal drum pattern.
+
+tempo: 120
+velocity: 80
+beats_per_chord: 4
+
+progression:
+  - name: Dm7
+    notes: [D4, F4, A4, C5]
+  - name: G7
+    notes: [G4, B4, D5, F5]
+  - name: Cmaj7
+    notes: [C4, E4, G4, B4]
+
+drums:
+  steps_per_bar: 8         # 8th-note grid (4/4 = 8 steps)
+  hits:
+    - note: ride
+      steps: [0, 2, 4, 6]  # every quarter beat
+      velocity: 65
+    - note: ride            # accented swung "and" on beats 2 and 4
+      steps: [3, 7]
+      velocity: 65
+    - note: pedal_hat
+      steps: [2, 6]         # beats 2 and 4
+      velocity: 55
+  swing_steps: [3, 7]       # these steps get pushed by swing_ticks
+  swing_ticks: 80           # triplet-8th swing push (≈ 2/3 of an 8th)

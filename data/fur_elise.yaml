@@ -1,0 +1,75 @@
+title: "Für Elise (opening)"
+description: >
+  A-minor motif, 8 bars of 3/8. Right-hand melody over a sustained bass.
+  The famous opening E5-D#5 alternation and the descending Am-E sequence.
+
+time_signature: [3, 8]
+# In 3/8 the beat unit is an eighth note (TPB=480). All durations below
+# are in sixteenth notes (0.25 quarter-lengths) or eighths (0.5).
+tempo: 140          # eighth-note pulse (quarter-note equiv ≈ 70 BPM)
+melody_velocity: 95
+bass_velocity: 70
+
+# (note or null for rest, duration as quarter-lengths)
+# sixteenth = 0.25, eighth = 0.5, dotted-eighth = 0.75
+melody:
+  # Bar 1 (Am): E5 D#5 E5 D#5 E5 B4  — the motif
+  - [E5,   0.25]
+  - [D#5,  0.25]
+  - [E5,   0.25]
+  - [D#5,  0.25]
+  - [E5,   0.25]
+  - [B4,   0.25]
+  # Bar 2 (Am): D5 C5 A4 — rest
+  - [D5,   0.25]
+  - [C5,   0.25]
+  - [A4,   0.5]
+  - [null, 0.5]
+  # Bar 3 (Am): C4 E4 A4 B4 — rising answer
+  - [C4,   0.25]
+  - [E4,   0.25]
+  - [A4,   0.25]
+  - [B4,   0.5]
+  - [null, 0.25]
+  # Bar 4 (E): E4 G#4 B4 C5 — leading tone, lands on C
+  - [E4,   0.25]
+  - [G#4,  0.25]
+  - [B4,   0.25]
+  - [C5,   0.5]
+  - [null, 0.25]
+  # Bar 5 (Am): repeat of bar 1
+  - [E5,   0.25]
+  - [D#5,  0.25]
+  - [E5,   0.25]
+  - [D#5,  0.25]
+  - [E5,   0.25]
+  - [B4,   0.25]
+  # Bar 6 (Am): repeat of bar 2
+  - [D5,   0.25]
+  - [C5,   0.25]
+  - [A4,   0.5]
+  - [null, 0.5]
+  # Bar 7 (Am): same rising answer
+  - [C4,   0.25]
+  - [E4,   0.25]
+  - [A4,   0.25]
+  - [B4,   0.5]
+  - [null, 0.25]
+  # Bar 8 (E → Am): E4 C5 B4 A4 — cadence home
+  - [E4,   0.25]
+  - [C5,   0.25]
+  - [B4,   0.25]
+  - [A4,   0.75]
+
+# One sustained bass note per bar (3 eighths = 1.5 quarter-lengths).
+# A2 under Am bars, E2 under the leading-tone bar.
+bass:
+  # [note, duration_ql]
+  - [A2, 1.5]   # bar 1  Am
+  - [A2, 1.5]   # bar 2  Am
+  - [A2, 1.5]   # bar 3  Am
+  - [E2, 1.5]   # bar 4  E (G# in melody = leading tone)
+  - [A2, 1.5]   # bar 5  Am
+  - [A2, 1.5]   # bar 6  Am
+  - [A2, 1.5]   # bar 7  Am
+  - [E2, 1.5]   # bar 8  E → resolves to A on the loop

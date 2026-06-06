@@ -1,0 +1,14 @@
+title: Jazz Progression
+description: ii-V-I in C major. The simplest building block.
+
+tempo: 120
+velocity: 80
+beats_per_chord: 4   # quarter notes per chord
+
+progression:
+  - name: Dm7
+    notes: [D4, F4, A4, C5]
+  - name: G7
+    notes: [G4, B4, D5, F5]
+  - name: Cmaj7
+    notes: [C4, E4, G4, B4]

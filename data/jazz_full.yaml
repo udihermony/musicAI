@@ -1,0 +1,40 @@
+title: Jazz Full
+description: ii-V-I with walking bass and swing drums. 4 loops.
+
+tempo: 120
+velocity: 80
+beats_per_chord: 4
+loops: 4
+
+progression:
+  - name: Dm7
+    notes: [D4, F4, A4, C5]
+  - name: G7
+    notes: [G4, B4, D5, F5]
+  - name: Cmaj7
+    notes: [C4, E4, G4, B4]
+
+# Walking bass: one note per beat, last beat is a chromatic approach to the next root.
+# Dm7 -> G7 (approach via Ab2), G7 -> Cmaj7 (via Db3), Cmaj7 -> Dm7 (via Eb2).
+walking_bass:
+  note_gap: 20          # ticks of silence between notes (articulation)
+  velocity: 85
+  bars:
+    - [D2,  F2,  A2,  Ab2]   # Dm7
+    - [G2,  B2,  D3,  Db3]   # G7
+    - [C3,  G2,  E2,  Eb2]   # Cmaj7
+
+drums:
+  steps_per_bar: 8
+  hits:
+    - note: ride
+      steps: [0, 2, 4, 6]
+      velocity: 65
+    - note: ride
+      steps: [3, 7]
+      velocity: 65
+    - note: pedal_hat
+      steps: [2, 6]
+      velocity: 55
+  swing_steps: [3, 7]
+  swing_ticks: 80

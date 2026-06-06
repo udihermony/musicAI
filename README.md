@@ -20,11 +20,18 @@ musicAI/
 ├── requirements.txt
 ├── to_sheet.py          # shared tool: engrave note-data (or a .mid) → MusicXML/PDF
 ├── play_live.py         # shared tool: stream any .mid live to GarageBand over IAC
-├── pieces/              # the compositions — one self-contained script each
+├── lib/
+│   └── music.py         # shared lib: note parsing, tick math, MIDI event building
+├── data/                # all musical content — edit these to change the music
+│   ├── jazz_progression.yaml  jazz_full.yaml  jazz_with_drums.yaml  jazz_blues.yaml
+│   ├── fur_elise.yaml
+│   ├── jazz_electronic.yaml   # chords, voicings, patterns, drum hits
+│   └── nocturne.yaml          # voicings, per-bar melodies, score sequence
+├── pieces/              # thin scripts: load YAML → call lib → write MIDI
 │   ├── jazz_progression.py   jazz_full.py   jazz_with_drums.py   jazz_blues.py
-│   ├── fur_elise.py          # classical melody study
-│   ├── jazz_electronic.py    # 16-bar A/B jazz-electronic with a 3-against-4 arp
-│   └── nocturne.py           # original solo-piano Nocturne in E minor (+ engraving)
+│   ├── fur_elise.py
+│   ├── jazz_electronic.py
+│   └── nocturne.py           # add --sheet to also engrave a PDF score
 ├── songs/               # human/LLM-readable write-ups, one per notable piece
 │   ├── jazz_electronic.md
 │   └── nocturne.md
@@ -33,6 +40,10 @@ musicAI/
 
 All scripts write their artifacts to `output/`, which is git-ignored — the tracked
 repo stays source-only. Regenerate anything by re-running its script.
+
+**To change the music:** edit the relevant `data/*.yaml` file and re-run the piece.
+No Python knowledge needed for most musical edits (changing a chord, transposing a
+note, adjusting tempo or velocity, tweaking a rhythm pattern).
 
 The jazz scripts build on each other (`jazz_blues` → `jazz_full` / `jazz_with_drums`
 → `jazz_progression`), which is why they live together in `pieces/`.

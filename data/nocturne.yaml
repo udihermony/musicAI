@@ -1,0 +1,213 @@
+title: "Nocturne in E minor"
+subtitle: "Lamplight"
+composer: "for Ehud · generated"
+description: >
+  Ternary A-B-A' + coda, 28 bars of 6/8 at Andante. A singing right-hand melody
+  over a rocking left-hand broken-chord arpeggio, with sustain pedal each bar.
+  Ends on a Picardy third (E major). Original solo-piano character piece.
+
+time_signature: [6, 8]
+# In 6/8 the beat unit is an eighth note. Durations below are quarter-lengths:
+# 0.25 = 16th, 0.5 = eighth, 0.75 = dotted-eighth, 1.0 = quarter, 1.5 = dotted-quarter.
+tempo: 76    # quarter-note BPM (Andante)
+
+# Section dynamics (by 0-based bar index in the score list)
+dynamics:
+  0:  mp   # A
+  8:  mf   # B — brighter
+  16: f    # A' — fuller
+  24: p    # coda — hushed
+
+# Left-hand arpeggio contour: indices into [bass, u1, u2, u3, u4] per bar.
+lh_arpeggio: [0, 1, 2, 3, 4, 3]   # 6 steps = 6 eighths = one 6/8 bar
+
+# Chord voicings: bass note + 4 ascending upper tones.
+# The A-section "line cliché" keeps the Em triad on top while only the bass moves.
+voicings:
+  Em:
+    bass: E2
+    upper: [B3, E4, G4, B4]
+  Em/D#:
+    bass: D#2
+    upper: [B3, E4, G4, B4]     # maj7 in bass (the chromatic descent)
+  Em/D:
+    bass: D2
+    upper: [B3, E4, G4, B4]     # m7 in bass
+  Em/C#:
+    bass: C#2
+    upper: [B3, E4, G4, B4]     # 6 in bass
+  Cmaj7:
+    bass: C2
+    upper: [C4, E4, G4, B4]
+  B7:
+    bass: B1
+    upper: [B3, D#4, F#4, A4]
+  D7:
+    bass: D2
+    upper: [A3, C4, F#4, C5]    # V7 of G — pivots to B section
+  G:
+    bass: G2
+    upper: [B3, D4, G4, B4]
+  D/F#:
+    bass: F#2
+    upper: [A3, D4, F#4, A4]
+  Em7:
+    bass: E2
+    upper: [B3, D4, G4, B4]
+  C:
+    bass: C2
+    upper: [C4, E4, G4, C5]
+  Am7:
+    bass: A1
+    upper: [C4, E4, G4, A4]
+  B7b9:
+    bass: B1
+    upper: [C4, D#4, F#4, A4]   # b9 = C, the ache before the coda
+  E:
+    bass: E2
+    upper: [G#3, B3, E4, G#4]   # Picardy major — the glow
+
+# Melody per referenced bar number. Durations in quarter-lengths.
+# Rests are written as [null, duration].
+melodies:
+  1:
+    - [B4,  0.75]
+    - [G4,  0.25]
+    - [A4,  0.25]
+    - [B4,  0.25]
+  2:
+    - [C5,  0.75]
+    - [B4,  0.25]
+    - [A4,  0.25]
+    - [G4,  0.25]
+  3:
+    - [D5,  0.75]
+    - [C5,  0.25]
+    - [B4,  0.25]
+    - [A4,  0.25]
+  4:
+    - [B4,  0.75]
+    - [A4,  0.25]
+    - [G4,  0.25]
+    - [F#4, 0.25]
+  5:
+    - [C5,  0.75]
+    - [D5,  0.25]
+    - [E5,  0.25]
+    - [D5,  0.25]
+  6:
+    - [B4,  0.75]
+    - [A4,  0.25]
+    - [F#4, 0.25]
+    - [D#4, 0.25]
+  7:
+    - [E5,  0.75]
+    - [D5,  0.25]
+    - [C5,  0.25]
+    - [B4,  0.25]
+  8:
+    - [A4,  0.5]
+    - [C5,  0.5]
+    - [D5,  0.5]
+  9:
+    - [B4,  0.25]
+    - [D5,  0.25]
+    - [G5,  0.5]
+    - [F#5, 0.25]
+    - [E5,  0.25]
+  10:
+    - [F#5, 0.25]
+    - [E5,  0.25]
+    - [D5,  0.5]
+    - [C#5, 0.25]
+    - [D5,  0.25]
+  11:
+    - [E5,  0.25]
+    - [D5,  0.25]
+    - [B4,  0.5]
+    - [G4,  0.25]
+    - [A4,  0.25]
+  12:
+    - [C5,  0.75]
+    - [E5,  0.25]
+    - [D5,  0.25]
+    - [C5,  0.25]
+  13:
+    - [A4,  0.5]
+    - [C5,  0.5]
+    - [E5,  0.5]
+  14:
+    - [F#5, 0.25]
+    - [E5,  0.25]
+    - [D5,  0.25]
+    - [C5,  0.25]
+    - [D5,  0.5]
+  15:
+    - [G5,  0.75]
+    - [F#5, 0.25]
+    - [E5,  0.25]
+    - [D5,  0.25]
+  16:
+    - [B4,  0.75]
+    - [A4,  0.25]
+    - [F#4, 0.25]
+    - [D#4, 0.25]
+  23:
+    - [E5,  0.75]
+    - [D5,  0.25]
+    - [C5,  0.25]
+    - [B4,  0.25]
+  24:
+    - [C5,  0.75]
+    - [B4,  0.25]
+    - [A4,  0.25]
+    - [F#4, 0.25]
+  25:
+    - [B4,  0.75]
+    - [A4,  0.25]
+    - [G4,  0.25]
+    - [E4,  0.25]
+  26:
+    - [G4,  0.75]
+    - [C5,  0.25]
+    - [B4,  0.25]
+    - [G4,  0.25]
+  27:
+    - [F#4, 0.75]
+    - [A4,  0.25]
+    - [F#4, 0.25]
+    - [D#4, 0.25]
+  28:
+    - [E5,  1.5]   # held — Picardy glow, fermata
+
+# The score: each bar is [chord_name, melody_ref].
+# A' (bars 17-22) reuses the A melody refs 1-6.
+score:
+  - [Em,     1]    # A section
+  - [Em/D#,  2]
+  - [Em/D,   3]
+  - [Em/C#,  4]
+  - [Cmaj7,  5]
+  - [B7,     6]
+  - [Em,     7]
+  - [D7,     8]
+  - [G,      9]    # B section (G major)
+  - [D/F#,   10]
+  - [Em7,    11]
+  - [C,      12]
+  - [Am7,    13]
+  - [D7,     14]
+  - [G,      15]
+  - [B7,     16]
+  - [Em,     1]    # A' section (melody refs reused)
+  - [Em/D#,  2]
+  - [Em/D,   3]
+  - [Em/C#,  4]
+  - [Cmaj7,  5]
+  - [B7,     6]
+  - [Em,     23]   # fresh cadence
+  - [B7b9,   24]
+  - [Em,     25]   # coda
+  - [Cmaj7,  26]
+  - [B7,     27]
+  - [E,      28]   # Picardy third
