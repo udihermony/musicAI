@@ -61,7 +61,10 @@ def write_full(path: str, loops: int = LOOPS) -> None:
 
 
 if __name__ == "__main__":
-    out = "jazz_full.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "jazz_full.mid")
     write_full(out, loops=LOOPS)
     total_bars = LOOPS * len(PROGRESSION)
     print(f"wrote {out} — {LOOPS} loops × {len(PROGRESSION)} bars = {total_bars} bars")

@@ -11,6 +11,7 @@ their real rhythms (including drums on channel 10).
 """
 
 import argparse
+import os
 import sys
 import time
 
@@ -34,7 +35,18 @@ def all_notes_off(out) -> None:
         out.send(mido.Message("control_change", control=123, value=0, channel=ch))
 
 
+def resolve(path: str) -> str:
+    """Accept a bare name (e.g. 'nocturne.mid') and find it in the repo's output/ dir."""
+    if os.path.exists(path):
+        return path
+    candidate = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", path)
+    if os.path.exists(candidate):
+        return candidate
+    return path  # let mido raise a clear error
+
+
 def play(path: str, port_name: str, lead_in: float = 0.0, loop: bool = False) -> None:
+    path = resolve(path)
     mid = mido.MidiFile(path)
     print(f"sending {path} ({mid.length:.1f}s) to: {port_name}")
     if lead_in > 0:

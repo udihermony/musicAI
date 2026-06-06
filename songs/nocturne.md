@@ -42,8 +42,8 @@ coda (25-28): Em  Cmaj7  B7  E
 
 ## How to hear it (and see it)
 
-- **Full mix:** `.venv/bin/python pieces/nocturne.py`, drag `nocturne.mid` into
-  GarageBand, assign a single **Grand Piano** to both tracks.
+- **Full mix:** `.venv/bin/python pieces/nocturne.py`, drag `output/nocturne.mid`
+  into GarageBand, assign a single **Grand Piano** to both tracks.
 - **Live audition:** `.venv/bin/python play_live.py nocturne.mid -i 4`
   (a single piano instrument is exactly right here — no multi-timbral caveat,
   since the whole piece is one instrument on channel 0).

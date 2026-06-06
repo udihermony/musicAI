@@ -76,7 +76,10 @@ def write_fur_elise(path: str) -> None:
 
 
 if __name__ == "__main__":
-    out = "fur_elise.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "fur_elise.mid")
     write_fur_elise(out)
     melody_bars = sum(d for _, d in MELODY) / BAR_TICKS
     bass_bars = sum(d for _, d in BASS_LINE) / BAR_TICKS

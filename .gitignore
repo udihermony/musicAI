@@ -3,7 +3,10 @@
 __pycache__/
 *.pyc
 
-# Heavy / throwaway render artifacts (regenerate from source)
+# Generated output (regenerate from source: run the piece, or --sheet)
+output/
+
+# Heavy / throwaway render artifacts
 *.png
 *.wav
 *.aif

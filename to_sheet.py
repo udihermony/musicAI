@@ -143,11 +143,20 @@ def from_midi(midi_path, basename=None, formats=("musicxml", "pdf")):
     return _render(sc, base, formats)
 
 
+def _target(basename, ext):
+    """Bare names land in the repo's output/ dir; a name with a path is honored as-is."""
+    if os.path.dirname(basename):
+        return os.path.abspath(f"{basename}.{ext}")
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+    os.makedirs(out_dir, exist_ok=True)
+    return os.path.join(out_dir, f"{basename}.{ext}")
+
+
 def _render(score, basename, formats):
     written = {}
-    xml = f"{basename}.musicxml"
-    score.write("musicxml", fp=os.path.abspath(xml))
-    written["musicxml"] = os.path.abspath(xml)
+    xml = _target(basename, "musicxml")
+    score.write("musicxml", fp=xml)
+    written["musicxml"] = xml
 
     wants_render = [f for f in formats if f in ("pdf", "png")]
     if wants_render:
@@ -157,7 +166,7 @@ def _render(score, basename, formats):
                   "(set MSCORE or open the .musicxml in a notation app).")
         else:
             for fmt in wants_render:
-                out = os.path.abspath(f"{basename}.{fmt}")
+                out = _target(basename, fmt)
                 if _run_mscore(ms, out, written["musicxml"]):
                     written[fmt] = out
                 else:

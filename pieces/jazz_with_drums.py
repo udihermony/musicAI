@@ -65,7 +65,10 @@ def write_full_arrangement(path: str) -> None:
 
 
 if __name__ == "__main__":
-    out = "jazz_with_drums.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "jazz_with_drums.mid")
     write_full_arrangement(out)
     print(f"wrote {out} — {len(PROGRESSION)} chords + swing drums")
     print("drag into GarageBand → 2 tracks. Assign a piano to track 1, a drum kit to track 2.")

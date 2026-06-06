@@ -32,7 +32,10 @@ def write_progression(path: str, progression, beats_per_chord: int = BEATS_PER_C
 
 
 if __name__ == "__main__":
-    out = "jazz_progression.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "jazz_progression.mid")
     write_progression(out, PROGRESSION)
     print(f"wrote {out} — {len(PROGRESSION)} chords @ {TEMPO_BPM} bpm")
     print("drag this .mid file onto a Software Instrument track in GarageBand")

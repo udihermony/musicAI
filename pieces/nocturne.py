@@ -202,7 +202,9 @@ def build_sheet(basename="nocturne"):
 
 
 if __name__ == "__main__":
-    out = "nocturne.mid"
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "nocturne.mid")
     write_nocturne(out)
     print(f"wrote {out} — Nocturne in E minor, 'Lamplight'")
     print(f"  {len(SCORE)} bars of 6/8 at {TEMPO_BPM} BPM (quarter); ternary A-B-A' + coda")

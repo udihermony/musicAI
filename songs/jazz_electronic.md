@@ -57,7 +57,7 @@ a snare fill into each section turnaround.
 
 ## How to hear it
 
-- **Full mix:** run `.venv/bin/python pieces/jazz_electronic.py`, drag `jazz_electronic.mid`
+- **Full mix:** run `.venv/bin/python pieces/jazz_electronic.py`, drag `output/jazz_electronic.mid`
   into GarageBand, assign the four instruments above.
 - **Live audition:** `.venv/bin/python play_live.py jazz_electronic.mid --loop -i 4`
   (see `CONTEXT.md` for the IAC setup and the single-instrument caveat).

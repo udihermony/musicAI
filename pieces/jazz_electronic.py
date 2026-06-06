@@ -184,7 +184,10 @@ def write_song(path):
 
 
 if __name__ == "__main__":
-    out = "jazz_electronic.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "jazz_electronic.mid")
     write_song(out)
     arp_notes = len(arp_events()) // 2
     names = [name for name, _, _, _ in CHORDS]

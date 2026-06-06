@@ -62,7 +62,10 @@ def write_blues(path: str, loops: int = LOOPS) -> None:
 
 
 if __name__ == "__main__":
-    out = "jazz_blues.mid"
+    import os
+    OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "output")
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, "jazz_blues.mid")
     write_blues(out)
     total_bars = LOOPS * len(WALKING_BASS_BLUES)
     print(f"wrote {out} — F jazz blues, 12 bars × {LOOPS} loops = {total_bars} bars")

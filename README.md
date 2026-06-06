@@ -25,10 +25,14 @@ musicAI/
 │   ├── fur_elise.py          # classical melody study
 │   ├── jazz_electronic.py    # 16-bar A/B jazz-electronic with a 3-against-4 arp
 │   └── nocturne.py           # original solo-piano Nocturne in E minor (+ engraving)
-└── songs/               # human/LLM-readable write-ups, one per notable piece
-    ├── jazz_electronic.md
-    └── nocturne.md
+├── songs/               # human/LLM-readable write-ups, one per notable piece
+│   ├── jazz_electronic.md
+│   └── nocturne.md
+└── output/              # everything generated (.mid/.musicxml/.pdf) — git-ignored
 ```
+
+All scripts write their artifacts to `output/`, which is git-ignored — the tracked
+repo stays source-only. Regenerate anything by re-running its script.
 
 The jazz scripts build on each other (`jazz_blues` → `jazz_full` / `jazz_with_drums`
 → `jazz_progression`), which is why they live together in `pieces/`.
@@ -48,14 +52,14 @@ python3 -m venv .venv
 
 ### 1. Compose → MIDI
 ```bash
-.venv/bin/python pieces/nocturne.py        # writes nocturne.mid (+ a summary)
+.venv/bin/python pieces/nocturne.py        # writes output/nocturne.mid (+ a summary)
 ```
 Then drag the `.mid` into GarageBand. GarageBand splits the MIDI channels onto
 separate tracks, so each instrument gets its own sound — this is the full-mix path.
 
 ### 2. Play live over IAC (no exporting)
 ```bash
-.venv/bin/python play_live.py nocturne.mid --loop -i 4
+.venv/bin/python play_live.py nocturne.mid --loop -i 4   # bare names resolve to output/
 ```
 Streams all tracks in real time to the IAC bus. Enable it once in **Audio MIDI
 Setup → MIDI Studio → IAC Driver → "Device is online,"** and record-enable /
@@ -67,8 +71,8 @@ live play is exactly right.
 
 ### 3. Engrave → sheet music
 ```bash
-.venv/bin/python pieces/nocturne.py --sheet   # writes nocturne.musicxml + nocturne.pdf
-.venv/bin/python to_sheet.py jazz_electronic.mid   # rough notation straight from a .mid
+.venv/bin/python pieces/nocturne.py --sheet      # output/nocturne.musicxml + .pdf
+.venv/bin/python to_sheet.py output/jazz_electronic.mid   # rough notation from a .mid
 ```
 `to_sheet.py` engraves from the **source note data** (clean rhythms/accidentals)
 via its `Sheet` builder API, or quick-and-dirty from a finished `.mid`. See
@@ -120,10 +124,10 @@ few times and always writes the MusicXML even if PDF rendering fails.
 
 ## Generated files
 
-Running the scripts produces `.mid`, `.musicxml`, and `.pdf` artifacts in the repo
-root. The deliverables (`.mid` / `.pdf` / `.musicxml`) are committed; heavy or
-throwaway renders (`.png`, `.wav`, the `.venv`) are git-ignored. Everything
-regenerates from source with the commands above.
+Everything the scripts produce (`.mid`, `.musicxml`, `.pdf`) goes into `output/`,
+which is git-ignored — so the tracked repo is source-only and the working tree
+stays clean. Regenerate any artifact by re-running its script (or `--sheet`).
+`play_live.py` and `to_sheet.py` accept bare names and look in `output/`.
 
 ## Dependencies
 
