@@ -23,6 +23,10 @@ PROJECTS_DIR = PROJ_DIR
 
 def _n_bars(d, loops):
     """Infer total bar count from the piece's data."""
+    # Explicit declaration always wins.
+    if "n_bars" in d:
+        return d["n_bars"]
+
     tracks  = d.get("tracks", [])
     by_type = {td["type"]: td for td in tracks}
 
@@ -47,8 +51,7 @@ def _n_bars(d, loops):
     if score:
         return len(score)
 
-    # Fallback: let the custom module's track list determine length.
-    return loops * len(d.get("chords", [d]))
+    return loops * len(d.get("chords", []))
 
 
 def _load_custom(name):

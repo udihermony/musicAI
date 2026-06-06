@@ -1,0 +1,64 @@
+title: Junky
+description: >
+  Funky jazz groove — dark, tight, syncopated. 92 BPM, 4/4.
+  The pocket comes from the kick syncopation (a-of-1 and and-of-4 pushes)
+  and the ghost-note bed underneath the snare backbeat.
+
+tempo: 92
+time_signature: [4, 4]
+n_bars: 8     # 8-bar loop
+
+tracks:
+  - name: Drums
+    type: drum_grid
+    channel: 9
+    steps_per_bar: 16
+
+    # Light 8th-note swing on the "and" positions — just enough jazz
+    # without losing the funk pocket.
+    swing_ticks: 30
+    swing_steps: [2, 6, 10, 14]
+
+    hits:
+      # --- Kick ---
+      # Downbeat kicks land harder; syncopated kicks sit back slightly.
+      - note: kick
+        steps: [0, 8]         # beats 1 and 3 — the anchors
+        velocity: 115
+      - note: kick
+        steps: [3, 10, 14]    # a-of-1, and-of-3, and-of-4 — the funk push
+        velocity: 92
+
+      # --- Snare ---
+      - note: snare
+        steps: [4, 12]        # backbeat on 2 and 4
+        velocity: 105
+      - note: snare            # ghost notes — the texture that makes it funky
+        steps: [2, 6, 9, 11, 13, 15]
+        velocity: 30
+
+      # --- Clap (layer with snare backbeat for punch) ---
+      - note: clap
+        steps: [4, 12]
+        velocity: 75
+
+      # --- Hi-hat ---
+      - note: closed_hat
+        steps: [0, 2, 4, 6, 8, 10, 12]   # 8th notes (step 14 is open hat)
+        velocity: 75
+      - note: open_hat
+        steps: [14]           # and-of-4 — breathes before coming back to 1
+        velocity: 90
+
+      # --- Cowbell (beats 1 & 3 — the jazz flavour on top of the funk) ---
+      - note: cowbell
+        steps: [0, 8]
+        velocity: 65
+
+    # Snare fill into bars 4 and 8 (escalating roll)
+    fill:
+      note: snare
+      steps: [10, 11, 12, 13, 14, 15]
+      velocity_start: 50
+      velocity_ramp: 12
+      every_n_bars: 4

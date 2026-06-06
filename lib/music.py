@@ -136,8 +136,9 @@ def write_midi(path, tracks, tpb=TPB):
 GM_DRUMS = {
     "kick":        36, "snare":      38, "clap":      39,
     "closed_hat":  42, "pedal_hat":  44, "open_hat":  46,
-    "ride":        51, "shaker":     70,
     "low_tom":     41, "mid_tom":    45, "high_tom":  48,
+    "ride":        51, "crash":      49, "ride_bell": 53,
+    "cowbell":     56, "shaker":     70, "tambourine": 54,
 }
 
 
