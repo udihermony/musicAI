@@ -41,12 +41,13 @@ musicAI/
 All scripts write their artifacts to `output/`, which is git-ignored — the tracked
 repo stays source-only. Regenerate anything by re-running its script.
 
-**To change the music:** edit the relevant `data/*.yaml` file and re-run the piece.
+**To change the music:** edit the relevant `data/*.yaml` file and re-run.
 No Python knowledge needed for most musical edits (changing a chord, transposing a
 note, adjusting tempo or velocity, tweaking a rhythm pattern).
 
-The jazz scripts build on each other (`jazz_blues` → `jazz_full` / `jazz_with_drums`
-→ `jazz_progression`), which is why they live together in `pieces/`.
+`jazz_electronic` is the only piece that still needs custom Python — its
+polyrhythmic arp and drone/comp duality are computed, not looked up from a table.
+Everything else is pure YAML → `render.py`.
 
 ## Setup
 
@@ -63,7 +64,9 @@ python3 -m venv .venv
 
 ### 1. Compose → MIDI
 ```bash
-.venv/bin/python pieces/nocturne.py        # writes output/nocturne.mid (+ a summary)
+.venv/bin/python render.py nocturne          # writes output/nocturne.mid
+.venv/bin/python render.py --all             # render every piece at once
+.venv/bin/python pieces/jazz_electronic.py   # the one custom piece
 ```
 Then drag the `.mid` into GarageBand. GarageBand splits the MIDI channels onto
 separate tracks, so each instrument gets its own sound — this is the full-mix path.
@@ -82,11 +85,13 @@ live play is exactly right.
 
 ### 3. Engrave → sheet music
 ```bash
-.venv/bin/python pieces/nocturne.py --sheet      # output/nocturne.musicxml + .pdf
+.venv/bin/python render.py --sheet nocturne          # output/nocturne.musicxml + .pdf
 .venv/bin/python to_sheet.py output/jazz_electronic.mid   # rough notation from a .mid
 ```
-`to_sheet.py` engraves from the **source note data** (clean rhythms/accidentals)
-via its `Sheet` builder API, or quick-and-dirty from a finished `.mid`. See
+`render.py --sheet` engraves from the **source YAML data** (clean rhythms/accidentals)
+via `to_sheet.build_sheet_from_yaml`. Any piece whose tracks use standard types
+(`scored_melody`, `arpeggio_lh`, `sequential_melody`, etc.) gets a score for free.
+`to_sheet.py` also accepts a raw `.mid` for a quick quantized rendering. See
 [Adding a score](#adding-a-score-to-a-piece) below.
 
 ## House conventions (how a piece is built)
@@ -95,30 +100,38 @@ via its `Sheet` builder API, or quick-and-dirty from a finished `.mid`. See
   sixteenth/eighth/etc. as named constants.
 - Build each instrument as its own `MidiTrack`: collect absolute-time note events,
   sort them, then convert to delta times when writing. (See `build_track` in
-  `pieces/jazz_electronic.py` and `pieces/nocturne.py` — the cleanest versions.)
+  `lib/music.py` and `pieces/jazz_electronic.py`.)
 - **One channel per instrument. Drums always on channel 9** (GM channel 10),
   using the General MIDI percussion map (kick 36, snare 38, clap 39, closed hat
   42, open hat 46, shaker 70, …).
 - `program_change` is a hint for GM synths; GarageBand ignores it and uses the
   track's assigned instrument. Sustain pedal = CC 64.
-- Each script's `__main__` prints a short human summary (bars, tempo, progression,
-  track list, and how to assign instruments in GarageBand).
 - Comment the **musical intent** (voicing degrees, why a chord is there), not the
   mechanics of mido.
 
 ## Adding a score to a piece
 
-Engrave from the source data so notation stays in sync with the audio. Pattern
-(see `build_sheet()` in `pieces/nocturne.py`):
+If the piece uses standard track types, sheet music is free — just add three
+fields to its YAML and run `render.py --sheet <name>`:
 
-```python
-from to_sheet import Sheet                  # repo root must be importable
-sh = Sheet("Title", subtitle="…", time_signature="6/8", key_sig="e",
-           tempo=("Andante", 76))
-rh, lh = sh.part("treble"), sh.part("bass")
-rh.dyn("mp"); rh.note(71, 1.5); rh.note(67, 0.5)   # durations are quarterLengths
-lh.note(40, 0.5); lh.chord([40, 47, 52], 3.0, fermata=True)
-sh.render("title")                          # → title.musicxml + title.pdf
+```yaml
+key: e                          # key signature (e, C, Bb, F#, etc.)
+tempo_marking: "Andante"        # optional text above the tempo mark
+tracks:
+  - name: Right Hand
+    type: scored_melody          # or sequential_melody, block_chords, etc.
+    clef: treble                 # treble or bass
+    ...
+  - name: Left Hand
+    type: arpeggio_lh
+    clef: bass
+    ...
+```
+
+`to_sheet.build_sheet_from_yaml` dispatches by `type:` — the same mapping that
+renders MIDI also renders notation. `drum_grid` tracks are silently skipped.
+
+For a custom piece (like `jazz_electronic`), use the low-level `Sheet` API directly:
 ```
 A piece in `pieces/` reaches the root tool with a one-line `sys.path` insert at
 the top (see `nocturne.py`). MuseScore is flaky headless, so `to_sheet` retries a

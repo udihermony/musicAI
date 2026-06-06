@@ -25,6 +25,10 @@ MSCORE env var to override the path); MusicXML is always written.
 
 import os
 import subprocess
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.music import note_to_midi, notes_to_midi
 
 from music21 import (stream, note, chord, meter, key, tempo, clef, layout,
                      metadata, dynamics, expressions, converter)
@@ -187,6 +191,127 @@ def _run_mscore(ms, out, xml, attempts=3):
             return True
         time.sleep(0.7)
     return False
+
+
+# ---------------------------------------------------------------------------
+# Per-track-type sheet builders (parallel to TRACK_BUILDERS in lib/music.py)
+# Each receives a Voice, the track dict, and the global piece dict.
+# drum_grid is intentionally absent — drums are not engraved here.
+# ---------------------------------------------------------------------------
+
+def _sheet_scored_melody(voice, td, d):
+    melodies = {int(k): v for k, v in
+                (td.get("melodies") or d.get("melodies", {})).items()}
+    score   = td.get("score") or d.get("score", [])
+    dyn_map = {int(k): v for k, v in
+               (td.get("dynamics") or d.get("dynamics", {})).items()}
+    last = len(score) - 1
+    for i, (_, mel_ref) in enumerate(score):
+        if i in dyn_map:
+            voice.dyn(dyn_map[i])
+        for pitch, dur_ql in melodies[int(mel_ref)]:
+            m = note_to_midi(pitch)
+            if m is None:
+                voice.rest(dur_ql)
+            else:
+                voice.note(m, dur_ql, fermata=(i == last))
+
+
+def _sheet_arpeggio_lh(voice, td, d):
+    voicings = td.get("voicings") or d.get("voicings", {})
+    score    = td.get("score") or d.get("score", [])
+    pattern  = td.get("pattern") or d.get("lh_arpeggio", [])
+    ts       = d.get("time_signature", [4, 4])
+    bar_ql   = ts[0] * (4 / ts[1])
+    step_ql  = bar_ql / max(len(pattern), 1)
+    last     = len(score) - 1
+    for i, (chord_name, _) in enumerate(score):
+        v   = voicings[chord_name]
+        arp = [note_to_midi(v["bass"])] + notes_to_midi(v["upper"])
+        if i == last:
+            voice.chord(arp, bar_ql, fermata=True)
+        else:
+            for idx in pattern:
+                voice.note(arp[idx], step_ql)
+
+
+def _sheet_sequential_melody(voice, td, d):
+    for pitch, dur_ql in td.get("notes", []):
+        m = note_to_midi(pitch)
+        if m is None:
+            voice.rest(dur_ql)
+        else:
+            voice.note(m, dur_ql)
+
+
+def _sheet_sustained_notes(voice, td, d):
+    for pitch, dur_ql in td.get("notes", []):
+        voice.note(note_to_midi(pitch), dur_ql)
+
+
+def _sheet_block_chords(voice, td, d):
+    default = td.get("beats_per_chord", d.get("beats_per_chord", 4))
+    for c in td.get("progression", []):
+        voice.chord(notes_to_midi(c["notes"]), float(c.get("beats", default)))
+
+
+def _sheet_walking_bass(voice, td, d):
+    for bar in td.get("bars", []):
+        for pitch in bar:
+            voice.note(note_to_midi(pitch), 1.0)
+
+
+_SHEET_BUILDERS = {
+    "scored_melody":     _sheet_scored_melody,
+    "arpeggio_lh":       _sheet_arpeggio_lh,
+    "sequential_melody": _sheet_sequential_melody,
+    "sustained_notes":   _sheet_sustained_notes,
+    "block_chords":      _sheet_block_chords,
+    "walking_bass":      _sheet_walking_bass,
+    # drum_grid: skip — percussion not engraved
+}
+
+
+def build_sheet_from_yaml(name, d=None):
+    """Build and render sheet music from a piece's YAML data.
+
+    name: piece name (used for the output file basename)
+    d:    already-loaded data dict; if None, loads from data/<name>.yaml
+
+    YAML fields used:
+      title, subtitle, composer  — score header
+      key:           e.g. 'e', 'C', 'Bb'  (default 'C')
+      tempo_marking: text label (e.g. 'Andante espressivo')
+      tempo:         BPM number
+      time_signature: [num, den]
+      tracks[].clef: 'treble' or 'bass' (default 'treble')
+    """
+    if d is None:
+        from lib.music import load
+        d = load(name)
+
+    ts = d.get("time_signature", [4, 4])
+    tempo_val = (d["tempo_marking"], d.get("tempo", 120)) \
+                if "tempo_marking" in d else d.get("tempo")
+
+    sh = Sheet(
+        d["title"],
+        subtitle=d.get("subtitle"),
+        composer=d.get("composer"),
+        time_signature=f"{ts[0]}/{ts[1]}",
+        key_sig=d.get("key", "C"),
+        tempo=tempo_val,
+    )
+
+    for td in d.get("tracks", []):
+        kind    = td.get("type", "")
+        builder = _SHEET_BUILDERS.get(kind)
+        if builder is None:
+            continue                       # drum_grid and unknowns are skipped
+        voice = sh.part(td.get("clef", "treble"))
+        builder(voice, td, d)
+
+    return sh.render(name)
 
 
 if __name__ == "__main__":

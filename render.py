@@ -76,7 +76,9 @@ def render(name):
 
 
 def _list_pieces():
-    custom = {"nocturne", "jazz_electronic"}
+    # jazz_electronic has algorithmic tracks (polyrhythmic arp, drone logic)
+    # that can't be expressed as YAML data — it stays in pieces/jazz_electronic.py
+    custom = {"jazz_electronic"}
     return sorted(
         f[:-5] for f in os.listdir(DATA_DIR)
         if f.endswith(".yaml") and f[:-5] not in custom
@@ -92,7 +94,8 @@ if __name__ == "__main__":
         print(f"Pieces: {', '.join(pieces)}")
         sys.exit(0)
 
-    targets = _list_pieces() if "--all" in args else args
+    want_sheet = "--sheet" in args
+    targets    = _list_pieces() if "--all" in args else [a for a in args if not a.startswith("-")]
 
     for name in targets:
         try:
@@ -105,5 +108,8 @@ if __name__ == "__main__":
                   + (f", ×{loops} loops" if loops > 1 else "") + "]")
             if tnames:
                 print(f"  tracks: {tnames}")
+            if want_sheet:
+                from to_sheet import build_sheet_from_yaml
+                build_sheet_from_yaml(name, d)
         except Exception as e:
             print(f"ERROR {name}: {e}", file=sys.stderr)

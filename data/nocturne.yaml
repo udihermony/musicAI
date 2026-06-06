@@ -9,7 +9,9 @@ description: >
 time_signature: [6, 8]
 # In 6/8 the beat unit is an eighth note. Durations below are quarter-lengths:
 # 0.25 = 16th, 0.5 = eighth, 0.75 = dotted-eighth, 1.0 = quarter, 1.5 = dotted-quarter.
-tempo: 76    # quarter-note BPM (Andante)
+tempo: 76              # quarter-note BPM (Andante)
+tempo_marking: "Andante espressivo"
+key: e                 # one sharp — E minor
 
 # Section dynamics (by 0-based bar index in the score list)
 dynamics:
@@ -22,12 +24,14 @@ dynamics:
 tracks:
   - name: Piano RH
     type: scored_melody
+    clef: treble
     channel: 0
     program: 0
     velocity_offset: 4    # RH sings slightly louder than the section base
 
   - name: Piano LH
     type: arpeggio_lh
+    clef: bass
     channel: 0
     pedal: true
     velocity_offset: -26  # softer than RH
