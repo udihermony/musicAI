@@ -293,6 +293,91 @@ def build_sustained_notes(td, d, loops=1, first=False):
                        program=td.get("program"), channel=ch, **_meta(td, d, first))
 
 
+_DYN_VEL = {
+    "ppp": 35, "pp": 45, "p": 58, "mp": 72,
+    "mf": 82, "f": 92, "ff": 104, "fff": 115,
+}
+
+
+def _vel_at(dyn_map, bar_index, fallback=72):
+    """Return velocity for bar_index given a {bar_index: dynamic_label} dict."""
+    vel = fallback
+    for k in sorted(int(k) for k in dyn_map):
+        if bar_index >= k:
+            vel = _DYN_VEL.get(str(dyn_map[k]), fallback)
+    return vel
+
+
+def build_scored_melody(td, d, loops=1, first=False):
+    """Melody stored as a {bar_ref: [(note, ql)]} dict, arranged by a score list.
+
+    score is a list of [chord_name, melody_ref] pairs (chord_name is ignored here —
+    it belongs to the accompaniment track). dynamics is a {bar_index: label} map.
+    velocity_offset is added to the section velocity (use a positive number for RH).
+    """
+    melodies   = {int(k): v for k, v in
+                  (td.get("melodies") or d.get("melodies", {})).items()}
+    score      = td.get("score") or d.get("score", [])
+    dyn_map    = td.get("dynamics") or d.get("dynamics", {})
+    ch         = td.get("channel", 0)
+    vel_offset = td.get("velocity_offset", 0)
+    last       = len(score) - 1
+    ev         = []
+    t          = 0
+    for i, (_, mel_ref) in enumerate(score):
+        vel = _vel_at(dyn_map, i) + vel_offset
+        for entry in melodies[int(mel_ref)]:
+            pitch, dur_ql = entry
+            dur = ql(dur_ql)
+            m   = note_to_midi(pitch)
+            if m is not None:
+                note_on(ev, t, m, dur, 66 if i == last else vel, ch=ch)
+            t += dur
+    return build_track(ev, td.get("name", "Melody"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
+def build_arpeggio_lh(td, d, loops=1, first=False):
+    """Chord voicings expanded as arpeggios via an index pattern, with sustain pedal.
+
+    voicings: {chord_name: {bass: note, upper: [notes]}}
+    score:    [[chord_name, any], ...]   (second element ignored)
+    pattern:  list of int indices into [bass, u0, u1, u2, u3, ...]
+    pedal:    true → emit CC64 sustain down/up each bar
+    velocity_offset: subtract from section velocity for a softer LH (use negative).
+    On the final bar, the chord is rolled (staggered note onsets).
+    """
+    voicings   = td.get("voicings") or d.get("voicings", {})
+    score      = td.get("score") or d.get("score", [])
+    pattern    = td.get("pattern") or d.get("lh_arpeggio", [])
+    dyn_map    = td.get("dynamics") or d.get("dynamics", {})
+    ch         = td.get("channel", 0)
+    pedal      = td.get("pedal", False)
+    vel_offset = td.get("velocity_offset", 0)
+    ts         = d.get("time_signature", [4, 4])
+    bar_ticks  = ql(ts[0] * (4 / ts[1]))
+    step_ticks = bar_ticks // max(len(pattern), 1)
+    last       = len(score) - 1
+    ev         = []
+    for i, (chord_name, _) in enumerate(score):
+        base  = i * bar_ticks
+        v     = voicings[chord_name]
+        arp   = [note_to_midi(v["bass"])] + notes_to_midi(v["upper"])
+        vel   = _vel_at(dyn_map, i) + vel_offset
+        if pedal:
+            cc(ev, base,            64, 127, ch=ch)
+            cc(ev, base + bar_ticks - 15, 64, 0, ch=ch)
+        if i == last:
+            for j, m in enumerate(arp):
+                note_on(ev, base + j * 30, m, bar_ticks - j * 30, vel + 4, ch=ch)
+        else:
+            for step, idx in enumerate(pattern):
+                v_note = vel + (8 if idx == 0 else 0)
+                note_on(ev, base + step * step_ticks, arp[idx], step_ticks, v_note, ch=ch)
+    return build_track(ev, td.get("name", "Accompaniment"),
+                       program=td.get("program"), channel=ch, **_meta(td, d, first))
+
+
 # Map type strings to builder functions (used by render.py)
 TRACK_BUILDERS = {
     "block_chords":      build_block_chords,
@@ -300,4 +385,6 @@ TRACK_BUILDERS = {
     "drum_grid":         build_drum_grid,
     "sequential_melody": build_sequential_melody,
     "sustained_notes":   build_sustained_notes,
+    "scored_melody":     build_scored_melody,
+    "arpeggio_lh":       build_arpeggio_lh,
 }

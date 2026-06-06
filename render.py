@@ -42,6 +42,11 @@ def _n_bars(d, loops):
         bar_ql = ts[0] * (4 / ts[1])
         return max(1, int(round(total / bar_ql)))
 
+    # Scored melody / arpeggio_lh: bar count = length of the score list.
+    score = d.get("score", [])
+    if score:
+        return len(score)
+
     return loops
 
 

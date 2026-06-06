@@ -18,6 +18,20 @@ dynamics:
   16: f    # A' — fuller
   24: p    # coda — hushed
 
+# tracks: references the shared data below (voicings, melodies, score, lh_arpeggio).
+tracks:
+  - name: Piano RH
+    type: scored_melody
+    channel: 0
+    program: 0
+    velocity_offset: 4    # RH sings slightly louder than the section base
+
+  - name: Piano LH
+    type: arpeggio_lh
+    channel: 0
+    pedal: true
+    velocity_offset: -26  # softer than RH
+
 # Left-hand arpeggio contour: indices into [bass, u1, u2, u3, u4] per bar.
 lh_arpeggio: [0, 1, 2, 3, 4, 3]   # 6 steps = 6 eighths = one 6/8 bar
 
