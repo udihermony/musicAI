@@ -237,11 +237,15 @@ def _sheet_arpeggio_lh(voice, td, d):
 
 def _sheet_sequential_melody(voice, td, d):
     for pitch, dur_ql in td.get("notes", []):
-        m = note_to_midi(pitch)
-        if m is None:
+        if pitch is None:
             voice.rest(dur_ql)
+        elif isinstance(pitch, list):
+            midis = [note_to_midi(p) for p in pitch if note_to_midi(p) is not None]
+            voice.chord(midis, dur_ql)
         else:
-            voice.note(m, dur_ql)
+            m = note_to_midi(pitch)
+            if m is not None:
+                voice.note(m, dur_ql)
 
 
 def _sheet_sustained_notes(voice, td, d):

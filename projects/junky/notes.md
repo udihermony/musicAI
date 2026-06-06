@@ -2,7 +2,7 @@
 
 **Style:** funky jazz — dark, syncopated, tight pocket
 **Key:** D minor / D Dorian · **Tempo:** 92 BPM · **Meter:** 4/4
-**Status:** iteration 2 — drums + bass
+**Status:** iteration 3 — drums + bass + Rhodes
 
 ## The groove concept
 
@@ -57,12 +57,32 @@ and-of-4:   A2 (8th)          — dominant pull back to D
 `articulation: 0.75` — each note sounds for 75% of its slot, keeping it tight
 and percussive (funky bass never sustains).
 
+## Rhodes track (added iteration 3)
+
+Rootless voicings throughout — bass covers the root. Four chord areas, 2 bars each.
+Stab positions vary every bar, never on a downbeat:
+
+| Bars | Chord | Voicing | Character |
+|---|---|---|---|
+| 1–2 | Dm9 | F4 A4 C5 E5 | settled tonic |
+| 3–4 | G9 | B3 D4 F4 A4 | Dorian IV — the bright signature |
+| 5–6 | Fmaj7♯11 | A3 C4 E4 B4 | chromatic mediant, floating |
+| 7 | Em7 | G4 B4 D5 F5 | ii chord, transitioning |
+| 8 | A7♭9 | C♯4 E4 G4 B♭4 | altered V (= C♯dim7), maximum tension → resolves |
+
+Rhythmic design: bar 1 stabs on e-of-2 and and-of-4; bar 2 has a single sparse
+stab on a-of-3; bars 3–4 use and-of-2 with a varying second hit; bars 5–6 tighten
+then thin out; bar 7 has one early a-of-1 anticipation; bar 8 returns to the two-stab
+pattern at peak tension before the loop snaps back to Dm9.
+
+The A7♭9 in bar 8 is enharmonically a C♯dim7 voicing (all minor thirds). The C♯
+and B♭ are borrowed from D harmonic minor — they don't belong in D Dorian, which
+is exactly what makes that bar feel so tense and satisfying to resolve.
+
 ## Possible next moves (in order of impact)
 
-1. **Rhodes / chord stabs** — sparse voicings, pushing on the off-beats.
-   Suggested: Dm9 (D F A C E) and Gm9 (G Bb D F A), rootless, mid register.
-   One or two stabs per bar on e-of-2 and a-of-3 (steps 5 and 11).
-   Don't over-voice — space is the point.
+1. **Lead line** — a short modal phrase (D Dorian: D E F G A B C) every 4 bars.
+   Sparse and conversational. Could be muted trumpet, flute, or a Rhodes right-hand run.
 
 2. **Lead line** — a short modal phrase (D Dorian: D E F G A B C) that enters
    every 4 bars. Sparse and conversational, not a melody. Could be Rhodes right

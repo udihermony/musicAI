@@ -273,11 +273,17 @@ def build_sequential_melody(td, d, loops=1, first=False):
     for _ in range(loops):
         for entry in td.get("notes", []):
             pitch, dur_ql = entry
-            slot = ql(dur_ql)
-            m    = note_to_midi(pitch)
-            if m is not None:
-                sounding = max(1, int(slot * articulation))
-                note_on(ev, t, m, sounding, vel, ch=ch)
+            slot     = ql(dur_ql)
+            sounding = max(1, int(slot * articulation))
+            if isinstance(pitch, list):           # chord — list of note names
+                for p in pitch:
+                    m = note_to_midi(p)
+                    if m is not None:
+                        note_on(ev, t, m, sounding, vel, ch=ch)
+            else:
+                m = note_to_midi(pitch)
+                if m is not None:
+                    note_on(ev, t, m, sounding, vel, ch=ch)
             t += slot
     return build_track(ev, td.get("name", "Melody"),
                        program=td.get("program"), channel=ch, **_meta(td, d, first))
