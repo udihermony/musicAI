@@ -64,79 +64,76 @@ tracks:
       every_n_bars: 4
 
   # ---------------------------------------------------------------------------
-  # Rhodes — comping chords, 8 bars written out (loops: 1).
+  # EP — comping chords, 8 bars written out (loops: 1).
   # All voicings rootless: bass covers the root.
   # Stab positions vary every bar — never on a downbeat.
   #
-  # Harmonic arc (2 bars each):
-  #   Bars 1-2: Dm9      F4 A4 C5 E5      tonic, settled
-  #   Bars 3-4: G9       B3 D4 F4 A4      Dorian IV — bright, the signature chord
-  #   Bars 5-6: Fmaj7#11 A3 C4 E4 B4      chromatic mediant, floating/modal
-  #   Bar  7:   Em7      G4 B4 D5 F5      ii chord, transitioning
-  #   Bar  8:   A7b9     C#4 E4 G4 Bb4   altered V (= C#dim7) — maximum tension
-  #             → resolves back to Dm9 at bar 1
+  # Harmonic arc — classic minor jazz changes:
+  #   Bars 1-2: Dm9    F4 A4 C5 E5     tonic
+  #   Bars 3-4: Bbmaj7 D4 F4 A4 C5     bVII — the signature minor-jazz colour
+  #   Bars 5-6: Gm9    Bb3 D4 F4 A4    iv, darker
+  #   Bar  7:   Em7b5  G4 Bb4 D5       ii°, 3-note, airy/transitional
+  #   Bar  8:   A9     C#4 E4 G4 B4    V9 — classic dominant, resolves to Dm
   # ---------------------------------------------------------------------------
-  - name: Rhodes
+  - name: EP
     type: sequential_melody
     channel: 2
     velocity: 80
-    articulation: 0.9     # just a touch of clip — Rhodes rings naturally
-    loops: 1              # 8 bars written out explicitly
+    articulation: 0.9
+    loops: 1
 
     notes:
-      # ---- Bars 1-2 · Dm9: F4 A4 C5 E5 ----
-      # Bar 1: stabs on step 5 (e-of-2) and step 14 (and-of-4 — lands with kick+hat)
-      - [null,              1.25]
-      - [[F4, A4, C5, E5], 0.25]   # step 5
-      - [null,              2.0]
-      - [[F4, A4, C5, E5], 0.25]   # step 14
-      - [null,              0.25]
-      # Bar 2: single late stab on step 11 (a-of-3) — space, lets bar 1 breathe
-      - [null,              2.75]
-      - [[F4, A4, C5, E5], 0.25]   # step 11
-      - [null,              1.0]
+      # ---- Bars 1-2 · Dm9 ----
+      # Bar 1: stabs on step 5 (e-of-2) and step 14 (and-of-4)
+      - [null,               1.25]
+      - [[F4, A4, C5, E5],  0.25]   # step 5
+      - [null,               2.0]
+      - [[F4, A4, C5, E5],  0.25]   # step 14
+      - [null,               0.25]
+      # Bar 2: single stab on step 11 (a-of-3) — space
+      - [null,               2.75]
+      - [[F4, A4, C5, E5],  0.25]   # step 11
+      - [null,               1.0]
 
-      # ---- Bars 3-4 · G9: B3 D4 F4 A4 ----
-      # Bar 3: stabs on step 6 (and-of-2) and step 14 (and-of-4)
-      - [null,              1.5]
-      - [[B3, D4, F4, A4], 0.25]   # step 6
-      - [null,              1.75]
-      - [[B3, D4, F4, A4], 0.25]   # step 14
-      - [null,              0.25]
-      # Bar 4: stabs on step 6 (and-of-2) and step 10 (and-of-3, locks with kick)
-      - [null,              1.5]
-      - [[B3, D4, F4, A4], 0.25]   # step 6
-      - [null,              0.75]
-      - [[B3, D4, F4, A4], 0.25]   # step 10
-      - [null,              1.25]
+      # ---- Bars 3-4 · Bbmaj7 ----
+      # Bar 3: step 6 (and-of-2) and step 14 (and-of-4)
+      - [null,               1.5]
+      - [[D4, F4, A4, C5],  0.25]   # step 6
+      - [null,               1.75]
+      - [[D4, F4, A4, C5],  0.25]   # step 14
+      - [null,               0.25]
+      # Bar 4: step 6 and step 10 (and-of-3, with kick)
+      - [null,               1.5]
+      - [[D4, F4, A4, C5],  0.25]   # step 6
+      - [null,               0.75]
+      - [[D4, F4, A4, C5],  0.25]   # step 10
+      - [null,               1.25]
 
-      # ---- Bars 5-6 · Fmaj7#11: A3 C4 E4 B4 ----
-      # (B4 is the #11 of F — creates a floating, Lydian open sound)
-      # Bar 5: stabs on step 5 and step 9 — close together, more urgent
-      - [null,              1.25]
-      - [[A3, C4, E4, B4], 0.25]   # step 5
-      - [null,              0.75]
-      - [[A3, C4, E4, B4], 0.25]   # step 9
-      - [null,              1.5]
-      # Bar 6: single stab on step 13 (e-of-4) — very sparse and late, tension rising
-      - [null,              3.25]
-      - [[A3, C4, E4, B4], 0.25]   # step 13
-      - [null,              0.5]
+      # ---- Bars 5-6 · Gm9 ----
+      # Bar 5: step 5 and step 9
+      - [null,               1.25]
+      - [[Bb3, D4, F4, A4], 0.25]   # step 5
+      - [null,               0.75]
+      - [[Bb3, D4, F4, A4], 0.25]   # step 9
+      - [null,               1.5]
+      # Bar 6: single sparse stab on step 13
+      - [null,               3.25]
+      - [[Bb3, D4, F4, A4], 0.25]   # step 13
+      - [null,               0.5]
 
-      # ---- Bar 7 · Em7: G4 B4 D5 F5 ----
-      # Single early stab on step 3 (a-of-1) — anticipates, creates forward pull
-      - [null,              0.75]
-      - [[G4, B4, D5, F5], 0.25]   # step 3
-      - [null,              3.0]
+      # ---- Bar 7 · Em7b5 (ii°) — 3-note, airy ----
+      # Single early stab on step 3 (a-of-1)
+      - [null,               0.75]
+      - [[G4, Bb4, D5],     0.25]   # step 3
+      - [null,               3.0]
 
-      # ---- Bar 8 · A7b9: C#4 E4 G4 Bb4 ----
-      # Enharmonically = C#dim7. The C# and Bb are borrowed from D harmonic minor.
-      # Two stabs, step 6 and step 14 — maximum tension right before resolving to Dm9.
-      - [null,              1.5]
-      - [[C#4, E4, G4, Bb4], 0.25]  # step 6
-      - [null,              1.75]
-      - [[C#4, E4, G4, Bb4], 0.25]  # step 14
-      - [null,              0.25]
+      # ---- Bar 8 · A9 (V9) — classic dominant, resolves to Dm ----
+      # Stabs on step 6 and step 14
+      - [null,               1.5]
+      - [[C#4, E4, G4, B4], 0.25]   # step 6
+      - [null,               1.75]
+      - [[C#4, E4, G4, B4], 0.25]   # step 14
+      - [null,               0.25]
 
   # ---------------------------------------------------------------------------
   # Bass — D minor / D Dorian. Syncopated 2-bar pattern × 4 loops = 8 bars.
